@@ -1,6 +1,6 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2015 The Regents of the University of California and the University of Southern California
-% Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
+% Copyright (C) 2016 The Regents of the University of California and the University of Southern California
+% Created by Chitresh Bhushan
 % 
 % This program is free software; you can redistribute it and/or
 % modify it under the terms of the GNU General Public License

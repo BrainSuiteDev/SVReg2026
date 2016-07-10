@@ -1,5 +1,5 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2015 The Regents of the University of California and the University of Southern California
+% Copyright (C) 2016 The Regents of the University of California and the University of Southern California
 % Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
 % 
 % This program is free software; you can redistribute it and/or
@@ -30,6 +30,9 @@ if cleanflag
     sub=clean_sqr_map(sub);
     subdata=sub.attributes;
 end
-tar_data=mygriddata(sub.u',sub.v',subdata,tar.u',tar.v',method);
+tar_data=zeros(length(tar.u),size(subdata,2));
+for jj=1:size(subdata,2)
+    tar_data(:,jj)=mygriddata(sub.u',sub.v',subdata(:,jj),tar.u',tar.v',method);
+end
 
 

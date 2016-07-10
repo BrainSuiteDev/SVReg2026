@@ -20,7 +20,7 @@ function compile_mex()
 
 try
     bin_dir = pwd;
-    src_dir = [bin_dir filesep '..' filesep 'src'];
+    src_dir = [bin_dir filesep '..'];
     mex_dir = [src_dir filesep 'MEX_Files'];
     thirdparty_dir = [src_dir filesep '3rdParty'];
     mex_files = ['*.' mexext];

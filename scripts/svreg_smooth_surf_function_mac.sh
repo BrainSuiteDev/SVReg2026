@@ -3,23 +3,23 @@
 exe_name=$0
 exe_dir=`dirname "$0"`
 
-# If MCR R2012a is installed in a non-default location, define correct path 
+# If MCR R2015b is installed in a non-default location, define correct path 
 # on next line and uncomment it (remove the leading "#")
 #BrainSuiteMCR="/path/to/your/MCR";
 
 if [ -z "$BrainSuiteMCR" ]; then
-  if [ -e /Applications/MATLAB/MATLAB_Compiler_Runtime/v717 ]; then
-    BrainSuiteMCR="/Applications/MATLAB/MATLAB_Compiler_Runtime/v717"
-  elif [ -e /Applications/MATLAB_R2012a.app/runtime ]; then
-    BrainSuiteMCR="/Applications/MATLAB_R2012a.app";  
+  if [ -e /Applications/MATLAB/MATLAB_Runtime/v90 ]; then
+    BrainSuiteMCR="/Applications/MATLAB/MATLAB_Runtime/v90"
+  elif [ -e /Applications/MATLAB_R2015b.app/runtime ]; then
+    BrainSuiteMCR="/Applications/MATLAB_R2015b.app";  
   else
     echo
-    echo "Could not find Matlab 2012a with Matlab Compiler or MCR 2012a (v7.17)."
-    echo "Please install the Matlab 2012a MCR from MathWorks at:"
+    echo "Could not find Matlab 2015b with Matlab Compiler or MCR 2015b (v7.17)."
+    echo "Please install the Matlab 2015b MCR from MathWorks at:"
     echo
     echo "http://www.mathworks.com/products/compiler/mcr/"
     echo 
-    echo "If you already have Matlab 2012a with the Matlab Compiler or MCR 2012a"
+    echo "If you already have Matlab 2015b with the Matlab Compiler or MCR 2015b"
     echo "installed, please edit ${exe_name} by uncommenting and editing the line:"
     echo "#BrainSuiteMCR=\"/path/to/your/MCR\";"
     echo "(replacing /path/to/your/MCR with the path to your Matlab or MCR installation)"
@@ -36,17 +36,18 @@ read -d '' usage <<EOF
   Authored by Anand A. Joshi, Signal and Image Processing Institute
   Department of Electrical Engineering, Viterbi School of Engineering, USC
 
-  usage: smooth_surf_func.sh in_file func_file out_file param
+  usage: svreg_smooth_surf_function.sh in_file func_file out_file param
 
   required input:
-  in_file: in_surf: input surface file
-  out_surf: input surface file
+  in_file: input surface file
+  func_file: surface file with function to be smoothed in .attributes field
+  out_surf: output surface file
   param (Optional): smoothing parameter (std dev in mm)
 
 EOF
 
 # Parse inputs
-if [ $# -lt 1 ]; then
+if [ $# -lt 3 ]; then
   echo
   echo "$usage";
   echo
@@ -56,7 +57,11 @@ fi
 INFILE=$1;
 FUNCFILE=$2;
 OUTFILE=$3;
-PARAM=$4;
+if [ $# -gt 3 ]; then
+	PARAM=$4;
+else
+	PARAM="10"
+fi
 
 shift
 
@@ -82,5 +87,5 @@ export XAPPLRESDIR;
 
 
 # Perform volume registration
-${exe_dir}/smooth_surf_function.app/Contents/MacOS/svreg_smooth_surf_function "${INFILE}" "${FUNCFILE}" "${OUTFILE}" "${PARAM}" 
+${exe_dir}/svreg_smooth_surf_function.app/Contents/MacOS/svreg_smooth_surf_function "${INFILE}" "${FUNCFILE}" "${OUTFILE}" "${PARAM}" 
 exit

@@ -1,5 +1,6 @@
 SVReg: Surface-Constrained Volumetric Registration
-Copyright (C) 2015 The Regents of the University of California and the University of Southern California
+Copyright (C) 2016 The Regents of the University of California and the University of Southern California
+
 
 Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
 

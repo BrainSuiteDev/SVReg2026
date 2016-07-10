@@ -3,23 +3,23 @@
 exe_name=$0
 exe_dir=`dirname "$0"`
 
-# If MCR R2012a is installed in a non-default location, define correct path 
+# If MCR R2015b is installed in a non-default location, define correct path 
 # on next line and uncomment it (remove the leading "#")
 #BrainSuiteMCR="/path/to/your/MCR";
 
 if [ -z "$BrainSuiteMCR" ]; then
-  if [ -e /Applications/MATLAB/MATLAB_Compiler_Runtime/v717 ]; then
-    BrainSuiteMCR="/Applications/MATLAB/MATLAB_Compiler_Runtime/v717"
-  elif [ -e /Applications/MATLAB_R2012a.app/runtime ]; then
-    BrainSuiteMCR="/Applications/MATLAB_R2012a.app";  
+  if [ -e /Applications/MATLAB/MATLAB_Runtime/v90 ]; then
+    BrainSuiteMCR="/Applications/MATLAB/MATLAB_Runtime/v90"
+  elif [ -e /Applications/MATLAB_R2015b.app/runtime ]; then
+    BrainSuiteMCR="/Applications/MATLAB_R2015b.app";  
   else
     echo
-    echo "Could not find Matlab 2012a with Matlab Compiler or MCR 2012a (v7.17)."
-    echo "Please install the Matlab 2012a MCR from MathWorks at:"
+    echo "Could not find Matlab 2015b with Matlab Compiler or MCR 2015b (v9.0)."
+    echo "Please install the Matlab 2015b MCR from MathWorks at:"
     echo
     echo "http://www.mathworks.com/products/compiler/mcr/"
     echo 
-    echo "If you already have Matlab 2012a with the Matlab Compiler or MCR 2012a"
+    echo "If you already have Matlab 2015b with the Matlab Compiler or MCR 2015b"
     echo "installed, please edit ${exe_name} by uncommenting and editing the line:"
     echo "#BrainSuiteMCR=\"/path/to/your/MCR\";"
     echo "(replacing /path/to/your/MCR with the path to your Matlab or MCR installation)"

@@ -1,5 +1,5 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2015 The Regents of the University of California and the University of Southern California
+% Copyright (C) 2016 The Regents of the University of California and the University of Southern California
 % Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
 % 
 % This program is free software; you can redistribute it and/or
@@ -20,7 +20,7 @@
 function svreg_smooth_surf_function(insurf, insurffunc, outsurf, param)
 % This function performs smoothing of data on surfaces
 % 
-if (nargin < 4)
+if (nargin < 3)
     fprintf('USAGE: svreg_smooth_surf_function.sh in_surf, in_func, out_surf\n');
     fprintf('in_surf: input surface file\n');
     fprintf('in_func: surface file in which surface function is defined in attributes field\n');

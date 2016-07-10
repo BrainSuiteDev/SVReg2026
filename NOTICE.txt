@@ -63,8 +63,14 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 
+****
+dijk.m
+Copyright (c) 1994-2002 by Michael G. Kay
+Matlog Version 6 19-Sep-2002
+https://www.mathworks.com/matlabcentral/fileexchange/5355-toolbox-graph/content/toolbox_graph/perform_dijkstra_propagation_old.m
+(Code covered by the BSD License)
 
-***
+****
 
 ordfilt3
 (Code covered by the BSD License)
@@ -145,6 +151,13 @@ You should have received a copy of the GNU General Public License
 along with RCC package; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+*********
+laplacian.m
+This code is a part of the BLOPEX package: 
+http://en.wikipedia.org/wiki/BLOPEX or directly 
+http://code.google.com/p/blopex/ 
+License: BSD
+Copyright 2010-2011 Bryan C. Smith, Andrew V. Knyazev
 *********
 xml2struct.m
 Copyright (c) 2010, Wouter Falkena

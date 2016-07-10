@@ -1,5 +1,5 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2015 The Regents of the University of California and the University of Southern California
+% Copyright (C) 2016 The Regents of the University of California and the University of Southern California
 % Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
 % 
 % This program is free software; you can redistribute it and/or
@@ -26,11 +26,14 @@ tmpdir=fullfile(pth,[subname,'.svreg.tmp']);
 % warning off
 % mkdir(tmpdir);
 % warning on
-subbasename_tmp=fullfile(tmpdir,subname);
-
+if ~exist(tmpdir,'dir')
+    subbasename_tmp=subbasename;
+else
+    subbasename_tmp=fullfile(tmpdir,subname);
+end
 logfname=[subbasename_tmp,'.svreg.log'];
 fp=fopen(logfname,'a+');
-fprintf(fp,'SVREG Version 15c(build#2225) (generate_stats_xls)  \n');
+fprintf(fp,'SVREG Version 16a(build#2234) (generate_stats_xls)  \n');
 fprintf(fp,'generate_stats_xls %s ',subbasename);
 for jjj=1:length(varargin)
     fprintf(fp,'%s ',varargin{jjj});
@@ -78,12 +81,20 @@ if existfile([subbasename_tmp,'.right.pial.cortex.manual.svreg.dfs'])&& existfil
     rp=readdfs([subbasename_tmp,'.right.pial.cortex.manual.svreg.dfs']);
 end
 
+% if thicknessPVC has been run then use thickness values from that.
+if existfile([subbasename,'.pvc-thickness_0-6mm.right.mid.cortex.dfs'])
+    r_th=readdfs([subbasename,'.pvc-thickness_0-6mm.right.mid.cortex.dfs']);
+    r.attributes=r_th.attributes;
+    l_th=readdfs([subbasename,'.pvc-thickness_0-6mm.left.mid.cortex.dfs']);
+    l.attributes=l_th.attributes;
+end
+
 if existfile([subbasename_tmp,'.svreg.corr.label.nii.gz']) || existfile([subbasename_tmp,'.svreg.label.nii.gz'])
     
     if ~isempty(strfind(flags,'r'))
         vl=load_nii_z([subbasename_tmp,'.svreg.corr.label.nii']);
     else
-        vl=load_nii_z([subbasename_tmp,'.svreg.label.nii']);
+        vl=load_nii_z([subbasename_tmp,'.svreg.label.nii']);vl.img=mod(vl.img,1000);
     end
     
 end
@@ -202,7 +213,7 @@ if existfile([subbasename_tmp,'.svreg.corr.label.nii.gz']) || existfile([subbase
     end
 end
 fclose(fp);
-
-copyfile([subbasename_tmp,'.roiwise.stats.txt'],[subbasename,'.roiwise.stats.txt'],'f')
-copyfile([subbasename_tmp,'.svreg.log'],[subbasename,'.svreg.log'],'f');
-
+if ~strcmp(subbasename_tmp,subbasename)
+    copyfile([subbasename_tmp,'.roiwise.stats.txt'],[subbasename,'.roiwise.stats.txt'],'f')
+    copyfile([subbasename_tmp,'.svreg.log'],[subbasename,'.svreg.log'],'f');
+end

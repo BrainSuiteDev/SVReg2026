@@ -3,23 +3,23 @@
 exe_name=$0
 exe_dir=`dirname "$0"`
 
-# If MCR R2012a is installed in a non-default location, define correct path 
+# If MCR R2015b is installed in a non-default location, define correct path 
 # on next line and uncomment it (remove the leading "#")
 #BrainSuiteMCR="/path/to/your/MCR";
 
 if [ -z "$BrainSuiteMCR" ]; then
-  if [ -e /Applications/MATLAB/MATLAB_Compiler_Runtime/v717 ]; then
-    BrainSuiteMCR="/Applications/MATLAB/MATLAB_Compiler_Runtime/v717"
-  elif [ -e /Applications/MATLAB_R2012a.app/runtime ]; then
-    BrainSuiteMCR="/Applications/MATLAB_R2012a.app";  
+  if [ -e /Applications/MATLAB/MATLAB_Runtime/v90 ]; then
+    BrainSuiteMCR="/Applications/MATLAB/MATLAB_Runtime/v90"
+  elif [ -e /Applications/MATLAB_R2015b.app/runtime ]; then
+    BrainSuiteMCR="/Applications/MATLAB_R2015b.app";  
   else
     echo
-    echo "Could not find Matlab 2012a with Matlab Compiler or MCR 2012a (v7.17)."
-    echo "Please install the Matlab 2012a MCR from MathWorks at:"
+    echo "Could not find Matlab 2015b with Matlab Compiler or MCR 2015b (v7.17)."
+    echo "Please install the Matlab 2015b MCR from MathWorks at:"
     echo
     echo "http://www.mathworks.com/products/compiler/mcr/"
     echo 
-    echo "If you already have Matlab 2012a with the Matlab Compiler or MCR 2012a"
+    echo "If you already have Matlab 2015b with the Matlab Compiler or MCR 2015b"
     echo "installed, please edit ${exe_name} by uncommenting and editing the line:"
     echo "#BrainSuiteMCR=\"/path/to/your/MCR\";"
     echo "(replacing /path/to/your/MCR with the path to your Matlab or MCR installation)"
@@ -49,13 +49,15 @@ read -d '' usage <<EOF
   atlas fileprefix        path and filename prefix of atlas files and labels
                           to which the subject will be registered
 
-  optional flags:
+  some optional flags:
   -v#     Controls the verbosity of output messages (# is 0, 1, or 2)
-  -r      Refine outputs at the expense of more processing time
   -s      Checks if all files necessary for volume registration are present;
           if so, skip the surface registration
+  -S      surface registration only
   -k      keep the intermediate files after the svreg sequence is complete
   -t      display timestamps along with output messages
+  -U      single thereaded mode
+For the full list, please check http://brainsuite.org/processing/svreg/usage/
 
 EOF
 

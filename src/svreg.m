@@ -1,16 +1,16 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2015 The Regents of the University of California and the University of Southern California
-% Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
-% 
+% Copyright (C) 2016 The Regents of the University of California and the University of Southern California
+% Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy
+%
 % This program is free software; you can redistribute it and/or
 % modify it under the terms of the GNU General Public License
 % as published by the Free Software Foundation; version 2.
-% 
+%
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 % GNU General Public License for more details.
-% 
+%
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
@@ -43,7 +43,7 @@ if ~exist('atlasbasename','var')
 end
 logfname=[subbasename_tmp,'.svreg.log'];
 fp=fopen(logfname,'a+');
-fprintf(fp,'SVREG Version 15c(build#2225) (svreg)  \n');
+fprintf(fp,'SVREG Version 16a(build#2234) (svreg)  \n');
 fprintf(fp,'svreg %s %s ',subbasename,atlasbasename);
 for jjj=1:length(varargin)
     fprintf(fp,'%s ',varargin{jjj});
@@ -94,21 +94,24 @@ end
 
 if ~exist('atlasbasename','var')
     disp1('Incorrect syntax','main',flags );
-    disp1('USAGE:','main',flags);
-    disp1('Matlab: svreg $subbasename $atlas_basename [skip_surfreg]','main',flags);
-    disp1('Command Line:run_svreg.sh $MCR_RUNTIME $subbasename [-flags]','main',flags);
-    disp1('s flag skips the surface registration and directly performs volume registration if the required files exist.','main',flags);
-    disp1('k flag keeps the intermediate files.','main',flags);
-    disp1(' ','main',flags);
-    disp1('Please refer to http://brainsuite.loni.ucla.edu for documentation.','main',flags);
+    disp1('USAGE:','svreg',flags);
+    disp1('svreg $subbasename $atlas_basename flags','svreg',flags);
+    disp1('-v#     Controls the verbosity of output messages (# is 0, 1, or 2)',flags);
+    disp1('-s flag skips the surface registration and directly performs volume registration if the required files exist.','main',flags);
+    disp1('-S surface registration only','svreg',flags);
+    disp1('-k flag keeps the intermediate files.','svreg',flags);
+    disp1('-t flag keeps the intermediate files.','svreg',flags);
+    disp1('-U single thereaded mode.','svreg',flags);    
+    disp1(' ','svreg',flags);
+    disp1('For the full list, please check http://brainsuite.org/processing/svreg/usage/.','svreg',flags);
     return;
 end
 
 if isempty(strfind(flags,'-gui'))
-    disp1('Started SVREG Version 15c(build#2225) (svreg) sequence','main',flags);
+    disp1('Started SVREG Version 16a(build#2234) (svreg) sequence','main',flags);
     disp1('The whole surface volume registration and labeling sequence takes about 90-100 min.','main',flags);
 else
-    disp1('StartSVREG:SVREG Version 15c(build#2225) (svreg)','main',flags);
+    disp1('StartSVREG:SVREG Version 16a(build#2234) (svreg)','main',flags);
 end
 
 fn={[subbasename,'.left.inner.cortex.dfs'],...%[subbasename,'.left.mid.cortex.dfs'],...
@@ -129,18 +132,7 @@ for kkk=1:length(fn)
         return;
     end
 end
-mtlbpool=exist('matlabpool');
 
-if mtlbpool==2 && ~isempty(strfind(flags,'-P'))
-    try
-        matlabpool close force;
-        matlabpool(3);
-    catch
-        delete(gcp('nocreate'));
-        parpool(3);
-        
-    end
-end
 p=mfilename('fullpath');
 [pth,~,~]=fileparts(p);
 pth=pth(1:end-4);
@@ -148,7 +140,7 @@ pth=pth(1:end-4);
 % pth=p(1:end-20);
 
 
-sprintf('SVREG Version 15c(build#2225) (svreg), Started...  \n');
+sprintf('SVREG Version 16a(build#2234) (svreg), Started...  \n');
 
 if exist('atlasbasename','var')
     if atlasbasename(1)=='-'
@@ -161,6 +153,26 @@ if ~exist('flags','var')
     flags='';
 end
 
+if ~strfind(flags,'-U')
+    % create a local cluster object
+    %delete(gcp('nocreate'));
+    pc = parcluster('local');
+    % explicitly set the JobStorageLocation to the temp directory that was
+    % created in your sbatch script
+    par_dir=strcat(subbasename,'_parcluster_tmp');
+    if exist(par_dir,'dir')
+        rmdir(par_dir,'s');
+    end
+    mkdir(par_dir);
+    pc.JobStorageLocation = par_dir;
+    ps = parallel.Settings;
+    ps.Pool.AutoCreate = true;
+    parpool(3);
+    
+else
+    ps = parallel.Settings;
+    ps.Pool.AutoCreate = false;
+end
 %svreg_prepare_files(subbasename, atlasbasename,flags);
 hemi={'left','right'};
 
@@ -223,13 +235,13 @@ generate_stats_xls(subbasename, flags);
 if isempty(strfind(flags,'-k'))
     clean_intermediate_files(subbasename);
 end
-if mtlbpool==2 && ~isempty(strfind(flags,'-P'))
-    try
-        matlabpool close
-    catch
-        delete(gcp('nocreate'));
+
+if exist('par_dir','var')
+    if exist(par_dir,'dir')
+        rmdir(par_dir,'s');
     end
 end
+
 disp1('svreg sequence finished','svreg',flags);
 
 

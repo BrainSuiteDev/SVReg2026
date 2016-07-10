@@ -1,0 +1,19 @@
+Compilation:
+
+SVReg is currently written in a mix of Matlab, C, and C++ code. To compile SVReg, open Matlab and navigate to the compile_scripts/ folder of the repository. The two main functions that you'd need are:
+compile_mex: compiles mex functions.
+compile_all: compiles Matlab code and generates executables; also used to package atlas(es) with executables and scripts for distribution
+
+compile_mex:
+Hopefully you won't need to use this too often, as the C and C++ functions are mostly 3rd Party. However, if you decide to try a new compilier, or a new version of Matlab, you'll have to run it. Simply running compile_mex without any input from within Matlab will compile all of the mex-functions and move them to ../MEX_Files.
+Note that you will have to change the generated Makefile in Linux and Mac to use clang instead of gcc.
+
+compile_all:
+This is the main compilation function. It DOES NOT use compile_mex in its execution, so if you're trying new compiliers or a new version of Matlab, run that function first. If you simply run:
+compile_all
+from the Matlab command-line, you will get executables. In Linux and Mac, you will also get a bunch of .sh files, but these aren't the ones you want to use. The ones you would want to use are in scripts/.
+First copy atlases BrainSuiteAtlas1 and BCI-DNI_brain_atlas to the SVReg folder.
+To create a package with atlas files and the proper scripts, run
+compile_all --package <version> <atlas ...>
+where <atlas ...> is a space-separated list of the atlas directories to include. This script automatically updates the version info in the Matlab files that reference it, so there is no need to go through and manually change them. Also, using compile_all this way will generate a XML manifest file. On Windows, the result will be a zip file, and on Linux and Mac it will be a .tar.gz file. 
+

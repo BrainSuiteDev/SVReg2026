@@ -1,0 +1,87 @@
+% subjID='100206';
+% target_file='/Applications/BrainSuite15c/svreg/BrainSuiteAtlas1/mri.label.nii.gz';
+% map_file=[ subjID '.svreg.inv.map.nii.gz'];
+% data_file=[ subjID '.dwi.RAS.FA.T1_coord.nii.gz'];
+% out_file=[subjID '.fa.atlas.nii.gz'];
+% interp_type='nearest';
+% datatype=16;
+
+function svreg_apply_map(map_file,data_file,out_file,target_file,smoothness,datatype,bitpix,interp_type)
+fprintf('SVREG Version 16a(build#2234) (svreg_apply_map)  \n');
+
+if exist('datatype','var')
+    if ~isempty(datatype)
+        if ischar(datatype)
+            datatype=str2double(datatype);
+        end
+    end
+end
+
+if exist('bitpix','var')
+    if ~isempty(bitpix)
+        if ischar(bitpix)
+            bitpix=str2double(bitpix);
+        end
+    end
+end
+
+if exist('smoothness','var')
+    if ~isempty(smoothness)
+        if ischar(smoothness)
+            smoothness=str2double(smoothness);
+        end
+    else
+        smoothness=1;
+    end
+else
+    smoothness=1;
+end
+
+vMap=load_nii_BIG_Lab(map_file);
+
+if exist('smoothness','var')
+    if ~isempty(smoothness)
+        vMap.img(:,:,:,1)=smooth3(vMap.img(:,:,:,1),'gaussian',3*smoothness,smoothness);
+        vMap.img(:,:,:,2)=smooth3(vMap.img(:,:,:,2),'gaussian',3*smoothness,smoothness);
+        vMap.img(:,:,:,3)=smooth3(vMap.img(:,:,:,3),'gaussian',3*smoothness,smoothness);
+    end
+end
+
+if isempty(strfind(data_file,'.eig.'))
+    vsubjFA=load_nii_BIG_Lab(data_file);
+    vAtlasFA=load_nii_BIG_Lab(target_file);vt=vAtlasFA;
+    vAtlasFA.img=interp3(vsubjFA.img,vMap.img(:,:,:,2),vMap.img(:,:,:,1),vMap.img(:,:,:,3),interp_type);
+    vAtlasFA.img(isnan(vAtlasFA.img)) = 0;
+    if exist('datatype','var')
+        if ~isempty(datatype)
+            vAtlasFA.hdr.dime.datatype=datatype;
+            vAtlasFA.hdr.dime.bitpix=bitpix;
+        else
+            vAtlasFA.hdr.dime.datatype=vsubjFA.hdr.dime.datatype;
+            vAtlasFA.hdr.dime.bitpix=vsubjFA.hdr.dime.bitpix;
+        end
+    else
+        vAtlasFA.hdr.dime.datatype=vsubjFA.hdr.dime.datatype;
+        vAtlasFA.hdr.dime.bitpix=vsubjFA.hdr.dime.bitpix;
+    end
+    if exist('smoothness','var')
+        if ~isempty(smoothness)
+            vAtlasFA.img=vAtlasFA.img.*(vt.img>0);
+        end
+    end
+    save_untouch_nii_gz(vAtlasFA,out_file);
+else
+    in_base=tempname;%
+ %   subbasename=data_file(1:strfind(data_file,'.dwi.')-1);
+    out_base=[in_base,'.atlas'];
+  %  out_base_orig=[subbasename,'.atlas'];
+    eig2nifti(data_file,in_base);
+    warp_DTI(map_file, [in_base '.L1.nii.gz'], [in_base '.L2.nii.gz'], [in_base '.L3.nii.gz'], [in_base '.V1.nii.gz'], [in_base '.V2.nii.gz'], [in_base '.V3.nii.gz'], out_base);
+    nifti2eig([out_base '.L1.nii.gz'], [out_base '.L2.nii.gz'], [out_base '.L3.nii.gz'], [out_base '.V1.nii.gz'], [out_base '.V2.nii.gz'], [out_base '.V3.nii.gz'], out_file);
+    %     v=load_untouch_eig_gz(data_file);
+    %     [interpL1, interpL2, interpL3, interpV1, interpV2, interpV3] = interp_dti_data(vMap.img, v.img(:,:,:,1), v.img(:,:,:,2), v.img(:,:,:,3), v.img(:,:,:,4:6), v.img(:,:,:,7:9), v.img(:,:,:,10:12), false);
+    %     regMap=load_nii_BIG_Lab(map_file);
+    %     [J1,J2,J3] = jacobian_nii(regMap, 'no_smooth');
+    %     [W1,W2,W3] = PPD(interpV1, interpV2, interpV3, J1, J2, J3);
+    %     generate_eig_file(interpL1, interpL2, interpL3, W1, W2, W3, out_file);
+end

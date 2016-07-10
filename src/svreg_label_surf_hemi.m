@@ -1,5 +1,5 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2015 The Regents of the University of California and the University of Southern California
+% Copyright (C) 2016 The Regents of the University of California and the University of Southern California
 % Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
 % 
 % This program is free software; you can redistribute it and/or
@@ -33,7 +33,7 @@ subbasename_tmp=fullfile(tmpdir,subname);
 
 logfname=[subbasename_tmp,'.svreg.log'];
 fp=fopen(logfname,'a+');
-fprintf(fp,'SVREG Version 15c(build#2225) (svreg_label_surf_hemi)  \n');
+fprintf(fp,'SVREG Version 16a(build#2234) (svreg_label_surf_hemi)  \n');
 fprintf(fp,'svreg_label_surf_hemi %s %s %s ',subbasename,atlasbasename,hemi);
 for jjj=1:length(varargin)
     fprintf(fp,'%s ',varargin{jjj});

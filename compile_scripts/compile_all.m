@@ -82,6 +82,9 @@ try
             mcc -m -v thicknessPVC.m
             mcc -m -v svreg_smooth_surf_function.m
             mcc -m -v svreg_make_atlas.m
+            mcc -m -v svreg_apply_map.m
+            mcc -m -v gui_bias_correct.m
+            
 
         elseif ismac || isunix
             cmd_str=['-I ',cmd_str];
@@ -101,6 +104,8 @@ try
             cmd_str12=[mrt,'/bin/mcc -m -v thicknessPVC.m ' cmd_str];
             cmd_str13=[mrt,'/bin/mcc -m -v svreg_smooth_surf_function.m ' cmd_str];
             cmd_str14=[mrt,'/bin/mcc -m -v svreg_make_atlas.m ' cmd_str];
+            cmd_str15=[mrt,'/bin/mcc -m -v svreg_apply_map.m ' cmd_str];
+            cmd_str16=[mrt,'/bin/mcc -m -v gui_bias_correct.m ' cmd_str];
             
             system(cmd_str1);
             system(cmd_str3);system(cmd_str4);
@@ -109,6 +114,7 @@ try
             system(cmd_str9);system(cmd_str10);
             system(cmd_str11);system(cmd_str12);
             system(cmd_str13);system(cmd_str14);
+            system(cmd_str15);system(cmd_str16);
             
         end
         
@@ -151,7 +157,8 @@ version_files = {
     ['..' filesep '3rdParty' filesep 'register_cc_curve.m'], ...    
     ['..' filesep 'src' filesep 'thicknessPVC.m'], ...
     ['..' filesep 'src' filesep 'svreg_smooth_surf_function.m'], ...
-    ['..' filesep 'src' filesep 'svreg_make_atlas.m']};
+    ['..' filesep 'src' filesep 'svreg_make_atlas.m'], ...
+    ['..' filesep 'src' filesep 'svreg_apply_map.m']};
 
 previous_version = fileread('svreg_version.txt');
 
@@ -196,6 +203,8 @@ copyfile('register_cc_curve.exe', [bindir filesep 'register_cc_curve.exe']);
 copyfile('thicknessPVC.exe', [bindir filesep 'thicknessPVC.exe']);
 copyfile('svreg_smooth_surf_function.exe', [bindir filesep 'svreg_smooth_surf_function.exe']);
 copyfile('svreg_make_atlas.exe', [bindir filesep 'svreg_make_atlas.exe']);
+copyfile('svreg_apply_map.exe', [bindir filesep 'svreg_apply_map.exe']);
+copyfile('gui_bias_correct.exe', [bindir filesep 'gui_bias_correct.exe']);
 copyfile('../3rdParty/AIR_bin/warp_coord_vol.exe', [bindir filesep 'warp_coord_vol.exe']);
 copyfile('../3rdParty/AIR_bin/warp_points.exe', [bindir filesep 'warp_points.exe']);
 
@@ -220,6 +229,8 @@ copyfile('register_cc_curve.app', [bindir filesep 'register_cc_curve.app']);
 copyfile('thicknessPVC.app', [bindir filesep 'thicknessPVC.app']);
 copyfile('svreg_smooth_surf_function.app', [bindir filesep 'svreg_smooth_surf_function.app']);
 copyfile('svreg_make_atlas.app', [bindir filesep 'svreg_make_atlas.app']);
+copyfile('svreg_apply_map.app', [bindir filesep 'svreg_apply_map.app']);
+copyfile('gui_bias_correct.app', [bindir filesep 'gui_bias_correct.app']);
 copyfile('../3rdParty/AIR_bin/warp_coord_vol_mac', [bindir filesep 'warp_coord_vol_mac']);
 copyfile('../3rdParty/AIR_bin/warp_points_mac', [bindir filesep 'warp_points_mac']);
 
@@ -238,6 +249,8 @@ copyfile('../scripts/register_cc_curve_mac.sh', [bindir filesep 'register_cc_cur
 copyfile('../scripts/thicknessPVC_mac.sh', [bindir filesep 'thicknessPVC.sh']);
 copyfile('../scripts/svreg_smooth_surf_function_mac.sh', [bindir filesep 'svreg_smooth_surf_function.sh']);
 copyfile('../scripts/svreg_make_atlas_mac.sh', [bindir filesep 'svreg_make_atlas.sh']);
+copyfile('../scripts/svreg_apply_map_mac.sh', [bindir filesep 'svreg_apply_map.sh']);
+copyfile('../scripts/gui_bias_correct_mac.sh', [bindir filesep 'gui_bias_correct.sh']);
 
 
 
@@ -264,6 +277,8 @@ copyfile('register_cc_curve', [bindir filesep 'register_cc_curve']);
 copyfile('thicknessPVC', [bindir filesep 'thicknessPVC']);
 copyfile('svreg_smooth_surf_function', [bindir filesep 'svreg_smooth_surf_function']);
 copyfile('svreg_make_atlas', [bindir filesep 'svreg_make_atlas']);
+copyfile('svreg_apply_map', [bindir filesep 'svreg_apply_map']);
+copyfile('gui_bias_correct', [bindir filesep 'gui_bias_correct']);
 copyfile('../3rdParty/AIR_bin/warp_coord_vol_linux', [bindir filesep 'warp_coord_vol_linux']);
 copyfile('../3rdParty/AIR_bin/warp_points_linux', [bindir filesep 'warp_points_linux']);
 
@@ -283,6 +298,8 @@ copyfile('../scripts/register_cc_curve_linux.sh', [bindir filesep 'register_cc_c
 copyfile('../scripts/thicknessPVC_linux.sh', [bindir filesep 'thicknessPVC.sh']);
 copyfile('../scripts/svreg_smooth_surf_function_linux.sh', [bindir filesep 'svreg_smooth_surf_function.sh']);
 copyfile('../scripts/svreg_make_atlas_linux.sh', [bindir filesep 'svreg_make_atlas.sh']);
+copyfile('../scripts/svreg_apply_map_linux.sh', [bindir filesep 'svreg_apply_map.sh']);
+copyfile('../scripts/gui_bias_correct_linux.sh', [bindir filesep 'gui_bias_correct.sh']);
 
 fileattrib([bindir filesep '*.sh'], '+x');
 
@@ -298,12 +315,12 @@ svreg_string = strrep(num2str(svreg_version), '.', 'p');
 
 directory =  sprintf('svreg_%s_%s', svreg_string, get_platform());
 bin_directory = [directory filesep 'bin'];
-rcc_directory = [directory filesep 'rcc'];
+%rcc_directory = [directory filesep 'rcc'];
 
 mkdir(directory);
 mkdir(bin_directory);
 
-copyfile(['..' filesep '3rdParty'], rcc_directory);
+%copyfile(['..' filesep '3rdParty'], rcc_directory);
 copyfile(['..' filesep 'LICENSE.txt'], [directory filesep 'LICENSE.txt']);
 copyfile(['..' filesep 'NOTICE.txt'], [directory filesep 'NOTICE.txt']);
 copyfile(['..' filesep 'README.txt'], [directory filesep 'README.txt']);
@@ -447,7 +464,9 @@ executables = {['clean_intermediate_files' fileEnding], ...
     ['volmap_ball' fileEnding], ...
     ['thicknessPVC' fileEnding], ...
     ['svreg_smooth_surf_function' fileEnding], ...
-    ['svreg_make_atlas' fileEnding]};
+    ['svreg_make_atlas' fileEnding], ...
+    ['svreg_apply_map' fileEnding], ...
+    ['gui_bias_correct' fileEnding]};
 
 if ismac
     for i = 1:length(executables)

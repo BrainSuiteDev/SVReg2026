@@ -1,5 +1,5 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2015 The Regents of the University of California and the University of Southern California
+% Copyright (C) 2016 The Regents of the University of California and the University of Southern California
 % Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
 % 
 % This program is free software; you can redistribute it and/or
@@ -91,12 +91,12 @@ if (exist(air_file_surf1,'file') && exist(air_file_surf2,'file'))
    vrt1=floor(vrt1*UCF_CONSTANT) / UCF_CONSTANT; % to account for differing fprintf behavior
    vrt2=floor(vrt2*UCF_CONSTANT) / UCF_CONSTANT; % on Mac OSX and Windows
    name1o=surf1.name;name2o=surf2.name;
-   if exist([surf1.name(1:end-3),'ucf'],'file')
-      delete([surf1.name(1:end-3),'ucf']);
-   end
-   if exist([surf2.name(1:end-3),'ucf'],'file')
-      delete([surf2.name(1:end-3),'ucf']);
-   end
+%    if exist([surf1.name(1:end-3),'ucf'],'file')
+%       delete([surf1.name(1:end-3),'ucf']);
+%    end
+%    if exist([surf2.name(1:end-3),'ucf'],'file')
+%       delete([surf2.name(1:end-3),'ucf']);
+%    end
    disp1('Pausing for 5 sec. to clear file buffers','svreg_label_surf_hemi',flags);
    pause(5);
    dlmwrite([surf1.name(1:end-3),'ucf'], vrt1, 'delimiter', '\t', 'precision', UCF_FORMAT);
@@ -146,10 +146,10 @@ end
       flg=0;
       surf1.vertices=load([surf1.name(1:end-4),'_wrpd.','ucf']);   surf1.vertices=double(single(surf1.vertices));
       surf2.vertices=load([surf2.name(1:end-4),'_wrpd.','ucf']);   surf2.vertices=double(single(surf2.vertices));
-      delete([surf1.name(1:end-4),'_wrpd.','ucf']);
-      delete([surf1.name(1:end-3),'ucf']);
-      delete([surf2.name(1:end-4),'_wrpd.','ucf']);
-      delete([surf2.name(1:end-3),'ucf']);
+%       delete([surf1.name(1:end-4),'_wrpd.','ucf']);
+%       delete([surf1.name(1:end-3),'ucf']);
+%       delete([surf2.name(1:end-4),'_wrpd.','ucf']);
+%       delete([surf2.name(1:end-3),'ucf']);
    end
    if length(surf1.vertices)*length(surf2.vertices) == 0
       flg=1;
@@ -286,8 +286,8 @@ else
 end
 
 load(sprintf('%s_out_register_cc.mat',surf2.name));
-delete(sprintf('%s_out_register_cc.mat',surf2.name));
-delete(sprintf('%s_in_register_cc.mat',surf2.name));
+%delete(sprintf('%s_out_register_cc.mat',surf2.name));
+%delete(sprintf('%s_in_register_cc.mat',surf2.name));
 xbdr2=griddata(surf1.vertices(bdr1,2),surf1.vertices(bdr1,3),xbdr1,Tr.Y(:,1),Tr.Y(:,2),'nearest'); %#ok<GRIDD>
 ybdr2=griddata(surf1.vertices(bdr1,2),surf1.vertices(bdr1,3),ybdr1,Tr.Y(:,1),Tr.Y(:,2),'nearest'); %#ok<GRIDD>
 

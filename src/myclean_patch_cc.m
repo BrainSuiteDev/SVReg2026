@@ -1,5 +1,5 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2015 The Regents of the University of California and the University of Southern California
+% Copyright (C) 2016 The Regents of the University of California and the University of Southern California
 % Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
 % 
 % This program is free software; you can redistribute it and/or
@@ -21,6 +21,10 @@
 function [p loc] =myclean_patch_cc(p)
 %Author: Anand A Joshi ajoshi@sipi.usc.edu
 po=p;
+if isempty(p.faces)
+    loc=[];
+    return;
+end
 p.faces=myclean_tri(p.faces);
 
 %conn=triangles_connectivity(p.faces);
@@ -80,7 +84,7 @@ if sum(c)==length(p.vertices)
        p.vcolor=po.vcolor(loc,:);
    end
    if isfield(po,'attributes')
-       p.attributes=po.attributes(loc);
+       p.attributes=po.attributes(loc,:);
    end
    if isfield(po,'labels')
        p.labels=po.labels(loc);
