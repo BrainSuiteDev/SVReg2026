@@ -1,5 +1,5 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2016 The Regents of the University of California and the University of Southern California
+% Copyright (C) 2017 The Regents of the University of California and the University of Southern California
 % Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
 % 
 % This program is free software; you can redistribute it and/or
@@ -26,7 +26,7 @@ if ~exist('atlas_name','var')
     [pth,~,~]=fileparts(p);
     pth=pth(1:end-4);
     %% Copy this file to the subject directory
-    atlasbasename=fullfile(pth,'HD_Atlas/mri.img');%'/ifs/faculty/shattuck/ajoshi/surf_reg/build_02_09_2011/Atlas/Labeled-Brain';
+    atlasbasename=fullfile(pth,'BrainSuiteAtlas1/mri.img');%'/ifs/faculty/shattuck/ajoshi/surf_reg/build_02_09_2011/Atlas/Labeled-Brain';
 else
     atlasbasename=atlas_name;
 end

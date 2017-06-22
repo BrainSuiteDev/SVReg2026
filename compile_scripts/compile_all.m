@@ -1,5 +1,5 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2015 The Regents of the University of California and the University of Southern California
+% Copyright (C) 2017 The Regents of the University of California and the University of Southern California
 % Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
 % 
 % This program is free software; you can redistribute it and/or
@@ -84,7 +84,9 @@ try
             mcc -m -v svreg_make_atlas.m
             mcc -m -v svreg_apply_map.m
             mcc -m -v gui_bias_correct.m
-            
+            mcc -m -v svreg_get_mni_tal.m
+            mcc -m -v generate_vol_param_stats_xls.m
+            mcc -m -v svreg_smooth_vol_function.m
 
         elseif ismac || isunix
             cmd_str=['-I ',cmd_str];
@@ -106,6 +108,9 @@ try
             cmd_str14=[mrt,'/bin/mcc -m -v svreg_make_atlas.m ' cmd_str];
             cmd_str15=[mrt,'/bin/mcc -m -v svreg_apply_map.m ' cmd_str];
             cmd_str16=[mrt,'/bin/mcc -m -v gui_bias_correct.m ' cmd_str];
+            cmd_str17=[mrt,'/bin/mcc -m -v svreg_get_mni_tal.m ' cmd_str];
+            cmd_str18=[mrt,'/bin/mcc -m -v generate_vol_param_stats_xls.m ' cmd_str];
+            cmd_str19=[mrt,'/bin/mcc -m -v svreg_smooth_vol_function.m ' cmd_str];
             
             system(cmd_str1);
             system(cmd_str3);system(cmd_str4);
@@ -115,6 +120,8 @@ try
             system(cmd_str11);system(cmd_str12);
             system(cmd_str13);system(cmd_str14);
             system(cmd_str15);system(cmd_str16);
+            system(cmd_str17);system(cmd_str18);
+            system(cmd_str19);
             
         end
         
@@ -158,7 +165,10 @@ version_files = {
     ['..' filesep 'src' filesep 'thicknessPVC.m'], ...
     ['..' filesep 'src' filesep 'svreg_smooth_surf_function.m'], ...
     ['..' filesep 'src' filesep 'svreg_make_atlas.m'], ...
-    ['..' filesep 'src' filesep 'svreg_apply_map.m']};
+    ['..' filesep 'src' filesep 'svreg_apply_map.m'],...
+    ['..' filesep 'src' filesep 'svreg_get_mni_tal.m'],...
+    ['..' filesep 'src' filesep 'generate_vol_param_stats_xls.m'],...
+    ['..' filesep 'src' filesep 'svreg_smooth_vol_function.m']};
 
 previous_version = fileread('svreg_version.txt');
 
@@ -205,9 +215,11 @@ copyfile('svreg_smooth_surf_function.exe', [bindir filesep 'svreg_smooth_surf_fu
 copyfile('svreg_make_atlas.exe', [bindir filesep 'svreg_make_atlas.exe']);
 copyfile('svreg_apply_map.exe', [bindir filesep 'svreg_apply_map.exe']);
 copyfile('gui_bias_correct.exe', [bindir filesep 'gui_bias_correct.exe']);
+copyfile('svreg_get_mni_tal.exe', [bindir filesep 'svreg_get_mni_tal.exe']);
+copyfile('generate_vol_param_stats_xls.exe', [bindir filesep 'generate_vol_param_stats_xls.exe']);
+copyfile('svreg_smooth_vol_function.exe', [bindir filesep 'svreg_smooth_vol_function.exe']);
 copyfile('../3rdParty/AIR_bin/warp_coord_vol.exe', [bindir filesep 'warp_coord_vol.exe']);
 copyfile('../3rdParty/AIR_bin/warp_points.exe', [bindir filesep 'warp_points.exe']);
-
 zip(workdir, workdir);
 rmdir(workdir, 's');
 end
@@ -231,6 +243,9 @@ copyfile('svreg_smooth_surf_function.app', [bindir filesep 'svreg_smooth_surf_fu
 copyfile('svreg_make_atlas.app', [bindir filesep 'svreg_make_atlas.app']);
 copyfile('svreg_apply_map.app', [bindir filesep 'svreg_apply_map.app']);
 copyfile('gui_bias_correct.app', [bindir filesep 'gui_bias_correct.app']);
+copyfile('svreg_get_mni_tal.app', [bindir filesep 'svreg_get_mni_tal.app']);
+copyfile('generate_vol_param_stats_xls.app', [bindir filesep 'generate_vol_param_stats_xls.app']);
+copyfile('svreg_smooth_vol_function.app', [bindir filesep 'svreg_smooth_vol_function.app']);
 copyfile('../3rdParty/AIR_bin/warp_coord_vol_mac', [bindir filesep 'warp_coord_vol_mac']);
 copyfile('../3rdParty/AIR_bin/warp_points_mac', [bindir filesep 'warp_points_mac']);
 
@@ -251,7 +266,9 @@ copyfile('../scripts/svreg_smooth_surf_function_mac.sh', [bindir filesep 'svreg_
 copyfile('../scripts/svreg_make_atlas_mac.sh', [bindir filesep 'svreg_make_atlas.sh']);
 copyfile('../scripts/svreg_apply_map_mac.sh', [bindir filesep 'svreg_apply_map.sh']);
 copyfile('../scripts/gui_bias_correct_mac.sh', [bindir filesep 'gui_bias_correct.sh']);
-
+copyfile('../scripts/svreg_get_mni_tal_mac.sh', [bindir filesep 'svreg_get_mni_tal.sh']);
+copyfile('../scripts/generate_vol_param_stats_xls_mac.sh', [bindir filesep 'generate_vol_param_stats_xls.sh']);
+copyfile('../scripts/svreg_smooth_vol_function_mac.sh', [bindir filesep 'svreg_smooth_vol_function.sh']);
 
 
 fileattrib([bindir filesep '*.sh'], '+x');
@@ -279,10 +296,11 @@ copyfile('svreg_smooth_surf_function', [bindir filesep 'svreg_smooth_surf_functi
 copyfile('svreg_make_atlas', [bindir filesep 'svreg_make_atlas']);
 copyfile('svreg_apply_map', [bindir filesep 'svreg_apply_map']);
 copyfile('gui_bias_correct', [bindir filesep 'gui_bias_correct']);
+copyfile('svreg_get_mni_tal', [bindir filesep 'svreg_get_mni_tal']);
+copyfile('generate_vol_param_stats_xls', [bindir filesep 'generate_vol_param_stats_xls']);
+copyfile('svreg_smooth_vol_function', [bindir filesep 'svreg_smooth_vol_function']);
 copyfile('../3rdParty/AIR_bin/warp_coord_vol_linux', [bindir filesep 'warp_coord_vol_linux']);
 copyfile('../3rdParty/AIR_bin/warp_points_linux', [bindir filesep 'warp_points_linux']);
-
-
 
 
 copyfile('../scripts/svreg_linux.sh', [bindir filesep 'svreg.sh']);
@@ -300,6 +318,9 @@ copyfile('../scripts/svreg_smooth_surf_function_linux.sh', [bindir filesep 'svre
 copyfile('../scripts/svreg_make_atlas_linux.sh', [bindir filesep 'svreg_make_atlas.sh']);
 copyfile('../scripts/svreg_apply_map_linux.sh', [bindir filesep 'svreg_apply_map.sh']);
 copyfile('../scripts/gui_bias_correct_linux.sh', [bindir filesep 'gui_bias_correct.sh']);
+copyfile('../scripts/svreg_get_mni_tal_linux.sh', [bindir filesep 'svreg_get_mni_tal.sh']);
+copyfile('../scripts/generate_vol_param_stats_xls_linux.sh', [bindir filesep 'generate_vol_param_stats_xls.sh']);
+copyfile('../scripts/svreg_smooth_vol_function_linux.sh', [bindir filesep 'svreg_smooth_vol_function.sh']);
 
 fileattrib([bindir filesep '*.sh'], '+x');
 
@@ -323,7 +344,7 @@ mkdir(bin_directory);
 %copyfile(['..' filesep '3rdParty'], rcc_directory);
 copyfile(['..' filesep 'LICENSE.txt'], [directory filesep 'LICENSE.txt']);
 copyfile(['..' filesep 'NOTICE.txt'], [directory filesep 'NOTICE.txt']);
-copyfile(['..' filesep 'README.txt'], [directory filesep 'README.txt']);
+copyfile(['..' filesep 'README.md'], [directory filesep 'README.md']);
 
 % Copy atlases
 for ii = 1:length(atlases)
@@ -342,7 +363,7 @@ end
 set_line_endings([directory filesep 'svregmanifest.xml'], line_ending);
 set_line_endings([directory filesep 'LICENSE.txt'], line_ending);
 set_line_endings([directory filesep 'NOTICE.txt'], line_ending);
-set_line_endings([directory filesep 'README.txt'], line_ending);
+set_line_endings([directory filesep 'README.md'], line_ending);
 
 end
 
@@ -466,7 +487,10 @@ executables = {['clean_intermediate_files' fileEnding], ...
     ['svreg_smooth_surf_function' fileEnding], ...
     ['svreg_make_atlas' fileEnding], ...
     ['svreg_apply_map' fileEnding], ...
-    ['gui_bias_correct' fileEnding]};
+    ['gui_bias_correct' fileEnding],...
+    ['svreg_get_mni_tal' fileEnding],...
+    ['generate_vol_param_stats_xls',fileEnding],...
+    ['svreg_smooth_vol_function',fileEnding]};
 
 if ismac
     for i = 1:length(executables)

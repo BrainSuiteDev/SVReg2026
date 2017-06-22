@@ -31,12 +31,12 @@ fi
 
 read -d '' usage <<EOF
 
-  smooth_surf_func : This script performs Laplace Beltrami smoothing on cortical surfaces
+  svreg_smooth_surf_function : This script performs Laplace Beltrami smoothing on cortical surfaces
 
   Authored by Anand A. Joshi, Signal and Image Processing Institute
   Department of Electrical Engineering, Viterbi School of Engineering, USC
 
-  usage: smooth_surf_func.sh in_file func_file out_file param
+  usage: svreg_smooth_surf_function.sh in_file func_file out_file param
 
   required input:
   in_file: input surface file

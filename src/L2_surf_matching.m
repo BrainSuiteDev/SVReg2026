@@ -1,5 +1,5 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2016 The Regents of the University of California and the University of Southern California
+% Copyright (C) 2017 The Regents of the University of California and the University of Southern California
 % Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
 % 
 % This program is free software; you can redistribute it and/or
@@ -17,7 +17,8 @@
 % USA.
 
 
-function [ind_ato,ind_subo]=L2_surf_matching(surf_atlas,surf_sub,flags)
+function [ind_ato,ind_subo, surf_atlas]=L2_surf_matching(surf_atlas,surf_sub,flags,Niter)
+
 if isempty(strfind(flags,'v'))
    verbosity=2;
 else
@@ -31,6 +32,9 @@ else
    disp1('L2DistMinStart','svreg_label_surf_hemi',flags);
 end
 
+if ~exist('Niter','var')
+    Niter=round(250/4);
+end
 surf_atlaso=surf_atlas;
 surf_subo=surf_sub;
 surf_atlas=reducepatch(surf_atlas,.05);surf_atlas_rp=surf_atlas;
@@ -43,7 +47,7 @@ lap_reg=25;
 L=loreta(surf_atlas);
 T=DelaunayTri(surf_sub.vertices);
 
-for kk=1:round(250/4)%150
+for kk=1:Niter%150
    if isempty(strfind(flags,'gui')) && verbosity>1
       disp1(sprintf('Iteration %d/%d',kk,round(250/4)),'svreg_label_surf_hemi',flags);
    else

@@ -1,5 +1,5 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2016 The Regents of the University of California and the University of Southern California
+% Copyright (C) 2017 The Regents of the University of California and the University of Southern California
 % Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy
 %
 % This program is free software; you can redistribute it and/or
@@ -43,7 +43,6 @@ if ~exist('atlasbasename','var')
 end
 logfname=[subbasename_tmp,'.svreg.log'];
 fp=fopen(logfname,'a+');
-fprintf(fp,'SVREG Version 16a(build#2234) (svreg)  \n');
 fprintf(fp,'svreg %s %s ',subbasename,atlasbasename);
 for jjj=1:length(varargin)
     fprintf(fp,'%s ',varargin{jjj});
@@ -72,7 +71,7 @@ for jj=1:size(varargin,2)
 end
 %flags=strrep(flags,'-','');
 %  a=strfind(flags,'v');
-if isempty(strfind(flags,'-v'))
+if ~contains(flags,'-v')
     verbosity=2;
 else
     a=strfind(flags,'-v');
@@ -97,21 +96,20 @@ if ~exist('atlasbasename','var')
     disp1('USAGE:','svreg',flags);
     disp1('svreg $subbasename $atlas_basename flags','svreg',flags);
     disp1('-v#     Controls the verbosity of output messages (# is 0, 1, or 2)',flags);
-    disp1('-s flag skips the surface registration and directly performs volume registration if the required files exist.','main',flags);
+    disp1('-s flag Checks if all files necessary for volume registration are present; if so, skip the surface registration and perform only volume registration.','main',flags);
     disp1('-S surface registration only','svreg',flags);
-    disp1('-k flag keeps the intermediate files.','svreg',flags);
-    disp1('-t flag keeps the intermediate files.','svreg',flags);
-    disp1('-U single thereaded mode.','svreg',flags);    
+    disp1('-k flag keep the intermediate files after the svreg sequence is complete','svreg',flags);
+    disp1('-t display timestamps along with output messages','svreg',flags);
+    disp1('-U single threaded mode','svreg',flags);
     disp1(' ','svreg',flags);
     disp1('For the full list, please check http://brainsuite.org/processing/svreg/usage/.','svreg',flags);
     return;
 end
 
-if isempty(strfind(flags,'-gui'))
-    disp1('Started SVREG Version 16a(build#2234) (svreg) sequence','main',flags);
+if ~contains(flags,'-gui')
     disp1('The whole surface volume registration and labeling sequence takes about 90-100 min.','main',flags);
 else
-    disp1('StartSVREG:SVREG Version 16a(build#2234) (svreg)','main',flags);
+    disp1('StartSVREG:SVREG  (svreg)','main',flags);
 end
 
 fn={[subbasename,'.left.inner.cortex.dfs'],...%[subbasename,'.left.mid.cortex.dfs'],...
@@ -140,7 +138,7 @@ pth=pth(1:end-4);
 % pth=p(1:end-20);
 
 
-sprintf('SVREG Version 16a(build#2234) (svreg), Started...  \n');
+sprintf('SVREG Started...  \n');
 
 if exist('atlasbasename','var')
     if atlasbasename(1)=='-'
@@ -153,7 +151,7 @@ if ~exist('flags','var')
     flags='';
 end
 
-if ~strfind(flags,'-U')
+if ~contains(flags,'-U')
     % create a local cluster object
     %delete(gcp('nocreate'));
     pc = parcluster('local');
@@ -167,6 +165,7 @@ if ~strfind(flags,'-U')
     pc.JobStorageLocation = par_dir;
     ps = parallel.Settings;
     ps.Pool.AutoCreate = true;
+    delete(gcp('nocreate')); 
     parpool(3);
     
 else
@@ -177,7 +176,7 @@ end
 hemi={'left','right'};
 
 %% These two commands can run in parallel
-if isempty(strfind(flags,'-s')) || ~exist([subbasename_tmp,'.target.right.pial.cortex.reg.dfs'],'file')
+if ~contains(flags,'-s') || ~exist([subbasename_tmp,'.target.right.pial.cortex.reg.dfs'],'file')
     parfor jj=1:2
         svreg_label_surf_hemi(subbasename,atlasbasename,hemi{jj},surreg_varargin{:});
     end
@@ -189,8 +188,7 @@ if isempty(strfind(flags,'-s')) || ~exist([subbasename_tmp,'.target.right.pial.c
     end
     %end
 end
-if isempty(strfind(flags,'-S'))
-    
+if ~contains(flags,'-S')
     
     %map2atlas_thickness(subbasename);
     
@@ -232,7 +230,7 @@ end
 generate_stats_xls(subbasename, flags);
 
 
-if isempty(strfind(flags,'-k'))
+if ~contains(flags,'-k')
     clean_intermediate_files(subbasename);
 end
 

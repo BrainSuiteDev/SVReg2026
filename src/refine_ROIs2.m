@@ -1,5 +1,5 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2016 The Regents of the University of California and the University of Southern California
+% Copyright (C) 2017 The Regents of the University of California and the University of Southern California
 % Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
 % 
 % This program is free software; you can redistribute it and/or
@@ -28,7 +28,6 @@ subbasename_tmp=fullfile(tmpdir,subname);
 
 logfname=[subbasename_tmp,'.svreg.log'];
 fp=fopen(logfname,'a+');
-fprintf(fp,'SVREG Version 16a(build#2234) (refine_ROIs2)  \n');
 fprintf(fp,'refine_ROIs2 %s %s ',subs,hemi);
 for jjj=1:length(varargin)
     fprintf(fp,'%s ',varargin{jjj});
@@ -41,14 +40,14 @@ for jj=1:size(varargin,2)
    flags=[flags,varargin{jj}];
 end
 
-if isempty(strfind(flags,'v'))
+if ~contains(flags,'v')
    verbosity=2;
 else
    a=strfind(flags,'v');
    verbosity=flags(a(1)+1);   verbosity= str2double(verbosity);
 end
 
-if isempty(strfind(flags,'gui'))
+if ~contains(flags,'gui')
    disp1('ROIRefinement','svreg_volreg',flags);
 else
    disp1(sprintf('ROIRef:%s hemi',hemi),'svreg_volreg',flags);

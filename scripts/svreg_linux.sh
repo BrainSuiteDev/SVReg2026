@@ -52,11 +52,11 @@ read -d '' usage <<EOF
   some optional flags:
   -v#     Controls the verbosity of output messages (# is 0, 1, or 2)
   -s      Checks if all files necessary for volume registration are present;
-          if so, skip the surface registration
+          if so, skip the surface registration and perform only volume registration
   -S      surface registration only
   -k      keep the intermediate files after the svreg sequence is complete
   -t      display timestamps along with output messages
-  -U      single thereaded mode
+  -U      singlethreaded mode
 For the full list, please check http://brainsuite.org/processing/svreg/usage/
 EOF
 

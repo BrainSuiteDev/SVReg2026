@@ -24,7 +24,6 @@ sname1=strrep(sname1,'.left.mid.cortex_smooth10.dfs','');
 
 logfname=[sname1,'.svreg.log'];
 fp=fopen(logfname,'a+');
-fprintf(fp,'SVREG Version 16a(build#2234) (register_cc_curve)  \n');
 fprintf(fp,'register_cc_curve %s \n',sname);
 fclose(fp);
 

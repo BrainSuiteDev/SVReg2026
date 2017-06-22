@@ -32,7 +32,7 @@ fi
 read -d '' usage <<EOF
 
 
-  svreg_apply_map : This script creates a new atlas from a given subject
+  svreg_apply_map : This script applies map to data
 
   Authored by Anand A. Joshi, Signal and Image Processing Institute
   Department of Electrical Engineering, Viterbi School of Engineering, USC

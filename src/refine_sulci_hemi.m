@@ -1,5 +1,5 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2016 The Regents of the University of California and the University of Southern California
+% Copyright (C) 2017 The Regents of the University of California and the University of Southern California
 % Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
 % 
 % This program is free software; you can redistribute it and/or
@@ -18,7 +18,7 @@
 
 
 function refine_sulci_hemi(subbasename,hemi,varargin)
-% usage refine_sulci_hemi subbasename hemi [�flag1 -flag2 ...] 
+% usage refine_sulci_hemi subbasename hemi [-flag1 -flag2 ...] 
 % This function implements geodesic curvature flow for refinement of sulcal
 % traces. The sulcal traces are assumed to be stored in
 % [subbasename_tmp,'.',hemi,'.mapped.dfc'] and the surfaces are stored in
@@ -35,7 +35,6 @@ subbasename_tmp=fullfile(tmpdir,subname);
 
 logfname=[subbasename_tmp,'.svreg.log'];
 fp=fopen(logfname,'a+');
-fprintf(fp,'SVREG Version 16a(build#2234) (refine_sulci_hemi)  \n');
 fprintf(fp,'refine_sulci_hemi %s %s ',subbasename,hemi);
 for jjj=1:length(varargin)
     fprintf(fp,'%s ',varargin{jjj});
@@ -48,7 +47,7 @@ for jj=1:size(varargin,2)
     flags=[flags,varargin{jj}];
 end
 
-if isempty(strfind(flags,'v'))
+if ~contains(flags,'v')
     verbosity=2;
 else
     a=strfind(flags,'v');
@@ -68,7 +67,7 @@ if ~exist('flags','var')
 end
 %clc;clear all;close all;
 %opengl software;
-if isempty(strfind(flags,'gui'))
+if ~contains(flags,'gui')
     disp1(sprintf('RefSulc:%s',hemi),'refine_sulci_hemi',flags);
 else
     disp1(sprintf('Refining Sulci for %s cortical hemisphere',hemi),'refine_sulci_hemi',flags);

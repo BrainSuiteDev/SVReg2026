@@ -7,7 +7,6 @@
 % datatype=16;
 
 function svreg_apply_map(map_file,data_file,out_file,target_file,smoothness,datatype,bitpix,interp_type)
-fprintf('SVREG Version 16a(build#2234) (svreg_apply_map)  \n');
 
 if exist('datatype','var')
     if ~isempty(datatype)
@@ -15,6 +14,14 @@ if exist('datatype','var')
             datatype=str2double(datatype);
         end
     end
+end
+
+if exist('interp_type','var')
+    if isempty(interp_type)
+        interp_type='natural';
+    end    
+else
+    interp_type='natural';
 end
 
 if exist('bitpix','var')
@@ -33,13 +40,13 @@ if exist('smoothness','var')
     else
         smoothness=1;
     end
-else
-    smoothness=1;
 end
-
 vMap=load_nii_BIG_Lab(map_file);
 
 if exist('smoothness','var')
+    if smoothness == 0
+        smoothness = [];
+    end
     if ~isempty(smoothness)
         vMap.img(:,:,:,1)=smooth3(vMap.img(:,:,:,1),'gaussian',3*smoothness,smoothness);
         vMap.img(:,:,:,2)=smooth3(vMap.img(:,:,:,2),'gaussian',3*smoothness,smoothness);
@@ -47,10 +54,10 @@ if exist('smoothness','var')
     end
 end
 
-if isempty(strfind(data_file,'.eig.'))
+if ~contains(data_file,'.eig.')
     vsubjFA=load_nii_BIG_Lab(data_file);
     vAtlasFA=load_nii_BIG_Lab(target_file);vt=vAtlasFA;
-    vAtlasFA.img=interp3(vsubjFA.img,vMap.img(:,:,:,2),vMap.img(:,:,:,1),vMap.img(:,:,:,3),interp_type);
+    vAtlasFA.img=interp3(single(vsubjFA.img),vMap.img(:,:,:,2),vMap.img(:,:,:,1),vMap.img(:,:,:,3),interp_type);
     vAtlasFA.img(isnan(vAtlasFA.img)) = 0;
     if exist('datatype','var')
         if ~isempty(datatype)
@@ -66,7 +73,7 @@ if isempty(strfind(data_file,'.eig.'))
     end
     if exist('smoothness','var')
         if ~isempty(smoothness)
-            vAtlasFA.img=vAtlasFA.img.*(vt.img>0);
+            vAtlasFA.img=double(vAtlasFA.img).*double(vt.img>0);
         end
     end
     save_untouch_nii_gz(vAtlasFA,out_file);

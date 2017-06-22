@@ -1,5 +1,5 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2016 The Regents of the University of California and the University of Southern California
+% Copyright (C) 2017 The Regents of the University of California and the University of Southern California
 % Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
 % 
 % This program is free software; you can redistribute it and/or
@@ -24,7 +24,6 @@ sname1=strrep(sname1,'.left.mid.cortex_smooth10.dfs','');
 
 logfname=[sname1,'.svreg.log'];
 fp=fopen(logfname,'a+');
-fprintf(fp,'SVREG Version 15c(build#2219) (register_cc_curve)  \n');
 fprintf(fp,'register_cc_curve %s \n',sname);
 fclose(fp);
 
