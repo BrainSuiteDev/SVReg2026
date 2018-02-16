@@ -87,6 +87,8 @@ try
             mcc -m -v svreg_get_mni_tal.m
             mcc -m -v generate_vol_param_stats_xls.m
             mcc -m -v svreg_smooth_vol_function.m
+            mcc -m -v svreg_resample.m
+            mcc -m -v svreg_labelwith_atlas.m
 
         elseif ismac || isunix
             cmd_str=['-I ',cmd_str];
@@ -111,6 +113,8 @@ try
             cmd_str17=[mrt,'/bin/mcc -m -v svreg_get_mni_tal.m ' cmd_str];
             cmd_str18=[mrt,'/bin/mcc -m -v generate_vol_param_stats_xls.m ' cmd_str];
             cmd_str19=[mrt,'/bin/mcc -m -v svreg_smooth_vol_function.m ' cmd_str];
+            cmd_str20=[mrt,'/bin/mcc -m -v svreg_resample.m ' cmd_str];
+            cmd_str21=[mrt,'/bin/mcc -m -v svreg_labelwith_atlas.m ' cmd_str];
             
             system(cmd_str1);
             system(cmd_str3);system(cmd_str4);
@@ -121,8 +125,8 @@ try
             system(cmd_str13);system(cmd_str14);
             system(cmd_str15);system(cmd_str16);
             system(cmd_str17);system(cmd_str18);
-            system(cmd_str19);
-            
+            system(cmd_str19);system(cmd_str20);
+            system(cmd_str21);
         end
         
         disp('Compilation done.');
@@ -168,7 +172,8 @@ version_files = {
     ['..' filesep 'src' filesep 'svreg_apply_map.m'],...
     ['..' filesep 'src' filesep 'svreg_get_mni_tal.m'],...
     ['..' filesep 'src' filesep 'generate_vol_param_stats_xls.m'],...
-    ['..' filesep 'src' filesep 'svreg_smooth_vol_function.m']};
+    ['..' filesep 'src' filesep 'svreg_smooth_vol_function.m'],...
+    ['..' filesep 'src' filesep 'svreg_labelwith_atlas.m']};
 
 previous_version = fileread('svreg_version.txt');
 
@@ -218,6 +223,8 @@ copyfile('gui_bias_correct.exe', [bindir filesep 'gui_bias_correct.exe']);
 copyfile('svreg_get_mni_tal.exe', [bindir filesep 'svreg_get_mni_tal.exe']);
 copyfile('generate_vol_param_stats_xls.exe', [bindir filesep 'generate_vol_param_stats_xls.exe']);
 copyfile('svreg_smooth_vol_function.exe', [bindir filesep 'svreg_smooth_vol_function.exe']);
+copyfile('svreg_resample.exe', [bindir filesep 'svreg_resample.exe']);
+copyfile('svreg_labelwith_atlas.exe', [bindir filesep 'svreg_labelwith_atlas.exe']);
 copyfile('../3rdParty/AIR_bin/warp_coord_vol.exe', [bindir filesep 'warp_coord_vol.exe']);
 copyfile('../3rdParty/AIR_bin/warp_points.exe', [bindir filesep 'warp_points.exe']);
 zip(workdir, workdir);
@@ -246,6 +253,8 @@ copyfile('gui_bias_correct.app', [bindir filesep 'gui_bias_correct.app']);
 copyfile('svreg_get_mni_tal.app', [bindir filesep 'svreg_get_mni_tal.app']);
 copyfile('generate_vol_param_stats_xls.app', [bindir filesep 'generate_vol_param_stats_xls.app']);
 copyfile('svreg_smooth_vol_function.app', [bindir filesep 'svreg_smooth_vol_function.app']);
+copyfile('svreg_resample.app', [bindir filesep 'svreg_resample.app']);
+copyfile('svreg_labelwith_atlas.app', [bindir filesep 'svreg_labelwith_atlas.app']);
 copyfile('../3rdParty/AIR_bin/warp_coord_vol_mac', [bindir filesep 'warp_coord_vol_mac']);
 copyfile('../3rdParty/AIR_bin/warp_points_mac', [bindir filesep 'warp_points_mac']);
 
@@ -269,6 +278,8 @@ copyfile('../scripts/gui_bias_correct_mac.sh', [bindir filesep 'gui_bias_correct
 copyfile('../scripts/svreg_get_mni_tal_mac.sh', [bindir filesep 'svreg_get_mni_tal.sh']);
 copyfile('../scripts/generate_vol_param_stats_xls_mac.sh', [bindir filesep 'generate_vol_param_stats_xls.sh']);
 copyfile('../scripts/svreg_smooth_vol_function_mac.sh', [bindir filesep 'svreg_smooth_vol_function.sh']);
+copyfile('../scripts/svreg_resample_mac.sh', [bindir filesep 'svreg_resample.sh']);
+copyfile('../scripts/svreg_labelwith_atlas_mac.sh', [bindir filesep 'svreg_labelwith_atlas.sh']);
 
 
 fileattrib([bindir filesep '*.sh'], '+x');
@@ -299,6 +310,8 @@ copyfile('gui_bias_correct', [bindir filesep 'gui_bias_correct']);
 copyfile('svreg_get_mni_tal', [bindir filesep 'svreg_get_mni_tal']);
 copyfile('generate_vol_param_stats_xls', [bindir filesep 'generate_vol_param_stats_xls']);
 copyfile('svreg_smooth_vol_function', [bindir filesep 'svreg_smooth_vol_function']);
+copyfile('svreg_resample', [bindir filesep 'svreg_resample']);
+copyfile('svreg_labelwith_atlas', [bindir filesep 'svreg_labelwith_atlas']);
 copyfile('../3rdParty/AIR_bin/warp_coord_vol_linux', [bindir filesep 'warp_coord_vol_linux']);
 copyfile('../3rdParty/AIR_bin/warp_points_linux', [bindir filesep 'warp_points_linux']);
 
@@ -321,6 +334,8 @@ copyfile('../scripts/gui_bias_correct_linux.sh', [bindir filesep 'gui_bias_corre
 copyfile('../scripts/svreg_get_mni_tal_linux.sh', [bindir filesep 'svreg_get_mni_tal.sh']);
 copyfile('../scripts/generate_vol_param_stats_xls_linux.sh', [bindir filesep 'generate_vol_param_stats_xls.sh']);
 copyfile('../scripts/svreg_smooth_vol_function_linux.sh', [bindir filesep 'svreg_smooth_vol_function.sh']);
+copyfile('../scripts/svreg_resample_linux.sh', [bindir filesep 'svreg_resample.sh']);
+copyfile('../scripts/svreg_labelwith_atlas_linux.sh', [bindir filesep 'svreg_labelwith_atlas.sh']);
 
 fileattrib([bindir filesep '*.sh'], '+x');
 
@@ -490,7 +505,9 @@ executables = {['clean_intermediate_files' fileEnding], ...
     ['gui_bias_correct' fileEnding],...
     ['svreg_get_mni_tal' fileEnding],...
     ['generate_vol_param_stats_xls',fileEnding],...
-    ['svreg_smooth_vol_function',fileEnding]};
+    ['svreg_smooth_vol_function',fileEnding],...
+    ['svreg_resample',fileEnding],...
+    ['svreg_labelwith_atlas',fileEnding]};
 
 if ismac
     for i = 1:length(executables)

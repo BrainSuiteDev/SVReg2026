@@ -133,7 +133,12 @@ if exist(interm_file_base,'file')
     map2=load_nii_z([subbasename_tmp,'.2Atlas_AIR.map.nii.gz']);
     map.img(isfinite(map2.img))=map2.img(isfinite(map2.img));
     map.img(~isfinite(map.img))=0;
-    map.img(map.img==0)=map_affine.img(map.img==0);
+    
+    pix = 5; [x1,y1,z1] = ndgrid(-pix:pix);
+    se1 = (sqrt(x1.^2 + y1.^2 + z1.^2) <=pix);
+    msk1=imdilate(map.img==0,se1);
+    
+    map.img(msk1)=map_affine.img(msk1);
     disp1('Singularities in Air based map are solved by copy from affine map','svreg_volreg',flags);
 end
 
@@ -239,7 +244,7 @@ if strfind(flags,'-H')
     nit=600;ind1=strfind(flags,'-H');
     for jj=ind1+1:length(flags)
         if ~isnan(str2double(flags(ind1+2:jj)))
-            nit=str2double(flags(ind1+1:jj));
+            nit=str2double(flags(ind1+2:jj));
         end
     end
 else

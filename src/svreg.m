@@ -211,7 +211,7 @@ if ~contains(flags,'-S')
     if 1%~isempty(strfind(flags,'r'))
         %%These two can be run in parallel
         
-        svreg_refinements(subbasename, atlasbasename,flags);
+        svreg_refinements(subbasename, atlasbasename,'',flags);
         
         %%These two can be run in parallel
         parfor jj=1:2

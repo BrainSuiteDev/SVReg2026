@@ -17,7 +17,14 @@
 % USA.
 
 
-function svreg_refinements(subbasename,atlas_name,varargin)
+function svreg_refinements(subbasename,atlas_name,postfix,varargin)
+
+% check if postfix is a valid string, if not use it as flag
+if strfind(postfix,'-')
+    varargin{end+1}=postfix;
+    postfix=[];
+end
+
 [pth,subname,extt]=fileparts(subbasename);
 subname=strcat(subname,extt);
 
@@ -60,6 +67,6 @@ if ~exist('flags','var')
     flags='';
 end
 %disp1('Refining Volumetric ROIs','svreg_refinements');
-refine_vol_labels(subbasename_tmp);
-correct_vol_labels(subbasename,flags);
+refine_vol_labels(subbasename_tmp,postfix);
+correct_vol_labels(subbasename,postfix,flags);
 

@@ -8,10 +8,10 @@ exe_dir=`dirname "$0"`
 #BrainSuiteMCR="/path/to/your/MCR";
 
 if [ -z "$BrainSuiteMCR" ]; then
-  if [ -e /usr/local/MATLAB/MATLAB_Runtime/v90 ]; then
-    BrainSuiteMCR="/usr/local/MATLAB/MATLAB_Runtime/v90";
-  elif [ -e /usr/local/MATLAB/R2015b/runtime ]; then
-    BrainSuiteMCR="/usr/local/MATLAB/R2015b";
+  if [ -e /Applications/MATLAB/MATLAB_Runtime/v90 ]; then
+    BrainSuiteMCR="/Applications/MATLAB/MATLAB_Runtime/v90"
+  elif [ -e /Applications/MATLAB_R2015b.app/runtime ]; then
+    BrainSuiteMCR="/Applications/MATLAB_R2015b.app";  
   else
     echo
     echo "Could not find Matlab 2015b with Matlab Compiler or MCR 2015b (v7.17)."
@@ -31,52 +31,51 @@ fi
 
 read -d '' usage <<EOF
 
-  svreg_smooth_vol_function : This script performs 3d vol news
   Authored by Anand A. Joshi, Signal and Image Processing Institute
   Department of Electrical Engineering, Viterbi School of Engineering, USC
 
-  usage: svreg_smooth_vol_function.sh in_file stdx stdy stdz out_file
+ Description:
+ This function creates labels using a different atlas. This function works 
+ only for BCI-DNI, USCBrain and USCLobes atlases. Since the underlying 
+ anatomy is the same, you can process data using one brain and use it with 
+ another one
 
-  required input:
-  in_file: input vol file
-  stdx,stdy,stdz: std dev (in mm) in 3 directions
-  out_vol: output vol file
+ Usage:
+ svreg_labelwith_atlas.sh subbasename atlasbasename postfix
+ 
+ three arguments are required
+
+ Arguments:
+ subbasename: subject basename
+ atlasbasename: atlas basename
+ postfix: postfix
+
 
 EOF
 
 # Parse inputs
-if [ $# -lt 5 ]; then
+if [ $# -lt 3 ]; then
   echo
   echo "$usage";
   echo
   exit;
 fi
 
-INFILE=$1;
-STDX=$2;
-STDY=$3;
-STDZ=$4;
-OUTFILE=$5;
+
 shift
 
 
+
 # Set up path for MCR applications.
-PATH=${exe_dir}:${PATH} ;
-LD_LIBRARY_PATH=.:${BrainSuiteMCR}/runtime/glnxa64 ;
-LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${BrainSuiteMCR}/bin/glnxa64 ;
-LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${BrainSuiteMCR}/sys/os/glnxa64;
-MCRJRE=${BrainSuiteMCR}/sys/java/jre/glnxa64/jre/lib/amd64 ;
-LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${MCRJRE}/native_threads ; 
-LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${MCRJRE}/server ;
-LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${MCRJRE}/client ;
-LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${MCRJRE} ;  
+DYLD_LIBRARY_PATH=.:${BrainSuiteMCR}/runtime/maci64 ;
+DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:${BrainSuiteMCR}/bin/maci64 ;
+DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:${BrainSuiteMCR}/sys/os/maci64;
 XAPPLRESDIR=${BrainSuiteMCR}/X11/app-defaults ;
-export PATH;
-export LD_LIBRARY_PATH;
+export DYLD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
 
-# Perform volume smoothing
-${exe_dir}/svreg_smooth_vol_function "${INFILE}" "${STDX}" "${STDY}" "${STDZ}" "${OUTFILE}" 
+# Change the atlas
+${exe_dir}/svreg_labelwith_atlas.app/Contents/MacOS/svreg_labelwith_atlas "$@" 
 
 exit

@@ -31,33 +31,45 @@ fi
 
 read -d '' usage <<EOF
 
-  svreg_smooth_vol_function : This script performs 3d vol news
   Authored by Anand A. Joshi, Signal and Image Processing Institute
   Department of Electrical Engineering, Viterbi School of Engineering, USC
 
-  usage: svreg_smooth_vol_function.sh in_file stdx stdy stdz out_file
+  usage: svreg_resample.sh in_file out_file [dim] [dx] [dy] [dz] [method] [extrapval]
 
-  required input:
-  in_file: input vol file
-  stdx,stdy,stdz: std dev (in mm) in 3 directions
-  out_vol: output vol file
+ Description:
+ This function resamples 3D or 4D input NIFTI-1 file.
+
+ Usage:
+ svreg_resample.sh in_file out_file [dim] [dx] [dy] [dz] [method] [extrapval]
+ while first two arguments are required, others are [OPTIONAL]
+
+ Arguments:
+ in_file: input nifti file in nii.gz file format
+ out_file: output nifti file in nii.gz format
+ [dim]: if this is '-size' output size is specified
+        if this is '-res' output pixel resolution is specified
+       default is -res 1 1 1 (istotropic sampling)
+ [dx],[dy],[dz]: if the dim='-size', then this is interpreted as output size
+                 if the dim=-res', then this is interpred as voxel resolution in x,y,z directions
+ [method]: interpolation methods: 'linear', 'nearest','cubic','spline' the
+ default is 'linear'.
+ [extrapval]: Values for extrapolation outside the grid on the boundary.
+ the default is median of all corners.
+
+ If the functions is called with only input and output file names, it
+ resamples to isotropic (1mm cubic) resolution
+
 
 EOF
 
 # Parse inputs
-if [ $# -lt 5 ]; then
+if [ $# -lt 2 ]; then
   echo
   echo "$usage";
   echo
   exit;
 fi
 
-INFILE=$1;
-STDX=$2;
-STDY=$3;
-STDZ=$4;
-OUTFILE=$5;
-shift
 
 
 # Set up path for MCR applications.
@@ -76,7 +88,7 @@ export LD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
 
-# Perform volume smoothing
-${exe_dir}/svreg_smooth_vol_function "${INFILE}" "${STDX}" "${STDY}" "${STDZ}" "${OUTFILE}" 
+# Perform resampling of 3D or 4D nifti files
+${exe_dir}/svreg_resample "$@" 
 
 exit

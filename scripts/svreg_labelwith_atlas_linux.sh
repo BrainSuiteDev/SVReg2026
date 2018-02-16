@@ -31,33 +31,37 @@ fi
 
 read -d '' usage <<EOF
 
-  svreg_smooth_vol_function : This script performs 3d vol news
   Authored by Anand A. Joshi, Signal and Image Processing Institute
   Department of Electrical Engineering, Viterbi School of Engineering, USC
 
-  usage: svreg_smooth_vol_function.sh in_file stdx stdy stdz out_file
 
-  required input:
-  in_file: input vol file
-  stdx,stdy,stdz: std dev (in mm) in 3 directions
-  out_vol: output vol file
+ Description:
+ This function creates labels using a different atlas. This function works 
+ only for BCI-DNI, USCBrain and USCLobes atlases. Since the underlying 
+ anatomy is the same, you can process data using one brain and use it with 
+ another one
+
+ Usage:
+ svreg_labelwith_atlas.sh subbasename atlasbasename postfix
+ 
+ three arguments are required
+
+ Arguments:
+ subbasename: subject basename
+ atlasbasename: atlas basename
+ postfix: postfix
+
 
 EOF
 
 # Parse inputs
-if [ $# -lt 5 ]; then
+if [ $# -lt 3 ]; then
   echo
   echo "$usage";
   echo
   exit;
 fi
 
-INFILE=$1;
-STDX=$2;
-STDY=$3;
-STDZ=$4;
-OUTFILE=$5;
-shift
 
 
 # Set up path for MCR applications.
@@ -76,7 +80,7 @@ export LD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
 
-# Perform volume smoothing
-${exe_dir}/svreg_smooth_vol_function "${INFILE}" "${STDX}" "${STDY}" "${STDZ}" "${OUTFILE}" 
+# Change the atlas
+${exe_dir}/svreg_labelwith_atlas "$@" 
 
 exit

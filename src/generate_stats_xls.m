@@ -63,9 +63,11 @@ end
 if existfile([subbasename_tmp,'.svreg.corr.manual.label.nii.gz'])
     vl=load_nii_z([subbasename_tmp,'.svreg.corr.manual.label.nii']);
 end
+% Read atlas and use the list of labels from the atlas
+vl_atlas=load_nii_z([subbasename_tmp '.target.label.nii.gz']);
+labs= unique(vl_atlas.img(:)); 
+labs = union([1,2,3],setdiff(labs,0));
 
-
-labs= unique(vl.img(:)); labs = union([1,2,3],setdiff(labs,0));
 % labs=[1,2,3,120,121,130,131,142,143,144,145,146,147,150,151,...
 %     162,163,164,165,166,167,168,169,170,171,172,173,...
 %     182,183,184,185,186,187,222,223,224,225,226,227,...

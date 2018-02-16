@@ -19,7 +19,7 @@
 
 
 
-function correct_vol_labels(subbasename,varargin)
+function correct_vol_labels(subbasename,postfix,varargin)
 [pth,subname,extt]=fileparts(subbasename);
 subname=strcat(subname,extt);
 tmpdir=fullfile(pth,[subname,'.svreg.tmp']);
@@ -45,7 +45,7 @@ end
 
 
 %gunzip(sprintf('%s.svreg.ref.label.nii.gz',subbasename));
-vl=load_nii_z(sprintf('%s.svreg.ref.label.nii',subbasename_tmp));vlo=vl;
+vl=load_nii_z(sprintf('%s.svreg.%sref.label.nii',subbasename_tmp,postfix));vlo=vl;
 %delete(sprintf('%s.svreg.ref.label.nii',subbasename));
 
 %gunzip([subbasename,'.cortex.dewisp.mask.nii.gz']);
@@ -57,7 +57,7 @@ vpvc=load_nii_z(sprintf('%s.pvc.frac.nii',subbasename));
 subind=find(vmsk.img(ind)>0);
 vl.img=double(vl.img).*double(vpvc.img>0);
 vl.img(ind(subind))=2000;
-save_untouch_nii_gz(vl,sprintf('%s.svreg.wm.label.nii',subbasename_tmp));vlwm=vl;
+save_untouch_nii_gz(vl,sprintf('%s.svreg.%swm.label.nii',subbasename_tmp,postfix));vlwm=vl;
 
 %gzip(sprintf('%s.svreg.wm.label.nii',subbasename_tmp));
 
@@ -154,7 +154,7 @@ v.img(indd)=F(XXu+.753,YYu+.352,ZZu+.551); clear XXu YYu ZZu F
 
 v.img=double(v.img).*double(vpvc.img>0);
 
-save_untouch_nii_gz(v,sprintf('%s.svreg.corr.label.nii',subbasename_tmp));
+save_untouch_nii_gz(v,sprintf('%s.svreg.%scorr.label.nii',subbasename_tmp,postfix));
 %gzip(sprintf('%s.svreg.corr.label.nii',subbasename_tmp));
 %delete(sprintf('%s.svreg.corr.label.nii',subbasename_tmp));
 
@@ -170,26 +170,8 @@ vl.img(ind(subind))=vl.img(ind(subind))+1000;
 if strfind(flags,'C')
     vl.img=double(vl.img).*double(vpvc.img>0);
 else
-    %     spial1=readdfs([subbasename,'.pial.cortex.dfs']);
-    %     if strfind(flags,'D')
-    %         aa=strfind(flags,'D');
-    %         msk_width=str2double(flags(aa+1));
-    %     else
-    %         msk_width=1;
-    %     end
-    %msk=surf2mask(spial1,cerebrum_mask,msk_width);
-    %  if sum(msk(:)>0) < .5*lgth_cbm
-    %      disp1('Error in generating pial surface mask, skipping the pial surface based correction','correct_vol_labels',flags);
-    %  else
-    %msk=(msk==0);
     vl.img(ismember(vl.img,cortical_rois)|vl.img>1000)=vl.img(ismember(vl.img,cortical_rois)|vl.img>1000).*double(msk(ismember(vl.img,cortical_rois)|vl.img>1000)>0);
     
-    % [~,~,ZZ]=ind2sub(size(msk),find(msk));
-    % mz=mean(ZZ(:));%mz=0;
-    % [~,~,ZZ]=ind2sub(size(msk),find(msk==0&  vpvc.img>0));ind2=find(msk==0& vpvc.img>0);
-    % ind=(ZZ>mz);
-    % vl.img(ind2(ind))=0;
-    % end
 end
 vvll=load_nii_z(sprintf('%s.label.surfreg.nii',subbasename_tmp));
 msk_full=double(imdilate(vvll.img,ones(3,3,3)));
@@ -197,9 +179,9 @@ msk_full((vl.img~=740) & (ismember(msk_full,cortical_rois)|cerebrum_mask.img>0))
 vl.img(~(ismember(vl.img,cortical_rois)|vl.img>1000))=vl.img(~(ismember(vl.img,cortical_rois)|vl.img>1000)).*double(msk_full(~(ismember(vl.img,cortical_rois)|vl.img>1000))>0);
 vlwm.img=imdilate(255*(vlwm.img==740),ones(10,10,10));
 vl.img((vl.img==740)& (vlwm.img==0))=0;
-save_untouch_nii_gz(vl,sprintf('%s.svreg.dws.label.nii',subbasename_tmp));
+save_untouch_nii_gz(vl,sprintf('%s.svreg.%sdws.label.nii',subbasename_tmp,postfix));
 %gzip(sprintf('%s.svreg.dws.label.nii',subbasename_tmp));
 %delete(sprintf('%s.svreg.dws.label.nii',subbasename_tmp));
 
-copyfile(sprintf('%s.svreg.dws.label.nii.gz',subbasename_tmp),sprintf('%s.svreg.label.nii.gz',subbasename),'f');
+copyfile(sprintf('%s.svreg.%sdws.label.nii.gz',subbasename_tmp,postfix),sprintf('%s.svreg.%slabel.nii.gz',subbasename,postfix),'f');
 
