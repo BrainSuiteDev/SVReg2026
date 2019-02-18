@@ -1,16 +1,16 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2017 The Regents of the University of California and the University of Southern California
-% Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
-% 
+% Copyright (C) 2019 The Regents of the University of California and the University of Southern California
+% Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy
+%
 % This program is free software; you can redistribute it and/or
 % modify it under the terms of the GNU General Public License
 % as published by the Free Software Foundation; version 2.
-% 
+%
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 % GNU General Public License for more details.
-% 
+%
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
@@ -18,7 +18,7 @@
 
 
 function refine_sulci_hemi(subbasename,hemi,varargin)
-% usage refine_sulci_hemi subbasename hemi [-flag1 -flag2 ...] 
+% usage refine_sulci_hemi subbasename hemi [-flag1 -flag2 ...]
 % This function implements geodesic curvature flow for refinement of sulcal
 % traces. The sulcal traces are assumed to be stored in
 % [subbasename_tmp,'.',hemi,'.mapped.dfc'] and the surfaces are stored in
@@ -33,15 +33,17 @@ subname=strcat(subname,extt);
 tmpdir=fullfile(pth,[subname,'.svreg.tmp']);
 subbasename_tmp=fullfile(tmpdir,subname);
 
-logfname=[subbasename_tmp,'.svreg.log'];
-fp=fopen(logfname,'a+');
-fprintf(fp,'refine_sulci_hemi %s %s ',subbasename,hemi);
-for jjj=1:length(varargin)
-    fprintf(fp,'%s ',varargin{jjj});
+if exist(tmpdir,'dir')    
+    logfname=[subbasename_tmp,'.svreg.log'];
+    fp=fopen(logfname,'a+');
+    fprintf(fp,'refine_sulci_hemi %s %s ',subbasename,hemi);
+    for jjj=1:length(varargin)
+        fprintf(fp,'%s ',varargin{jjj});
+    end
+    fprintf(fp,'\n');
+    
+    fclose(fp);
 end
-fprintf(fp,'\n');
-
-fclose(fp);
 flags='';
 for jj=1:size(varargin,2)
     flags=[flags,varargin{jj}];
@@ -74,8 +76,16 @@ else
 end
 dt=1;1e-4; Nit=5;
 mu=3;%NumCommTri=100;
-surf1=readdfs([subbasename_tmp,'.',hemi,'.mid.cortex.reg.dfs']);
-curves1=readdfc_sipi([subbasename_tmp,'.',hemi,'.mapped.dfc']);
+
+if exist([subbasename_tmp,'.',hemi,'.mid.cortex.reg.dfs'],'file') && exist([subbasename_tmp,'.',hemi,'.mapped.dfc'],'file')
+    surf1=readdfs([subbasename_tmp,'.',hemi,'.mid.cortex.reg.dfs']);
+    curves1=readdfc_sipi([subbasename_tmp,'.',hemi,'.mapped.dfc']);
+    tmp_files_exist=1;
+else
+    surf1=readdfs([subbasename,'.',hemi,'.mid.cortex.svreg.dfs']);
+    curves1=readdfc_sipi([subbasename,'.',hemi,'.mapped.dfc']);
+    tmp_files_exist=0;
+end
 curvesout=curves1;
 
 
@@ -89,9 +99,9 @@ for sul=1:length(curves1)
     end
     
     ind=dsearchn(surf1.vertices,sul1);
-    sdf=signed_dist_func(surf1,ind,7);
+    sdf=signed_dist_func(surf1,ind,15);
     %figure;patch('faces',surf1.faces,'vertices',surf1.vertices,'facevertexcdata',2*(sdf<30),'facecolor','interp','edgecolor','none');
-    ptch= sdf<10;
+    ptch= sdf<20;
     zp=zeros(length(surf1.vertices),1);zp(ptch)=1;
     sm=zp(surf1.faces(:,1))+zp(surf1.faces(:,2))+zp(surf1.faces(:,3));
     surf1c=surf1;
@@ -99,10 +109,7 @@ for sul=1:length(curves1)
     if(length(surf1c.faces)<5)
         continue;
     end
-        
-    if sul ==23
-        disp('hi');
-    end
+    
     surf1c=myclean_patch_cc(surf1c);
     if length(surf1c.vertices)<20
         continue;
@@ -150,10 +157,10 @@ for sul=1:length(curves1)
     f=(1+curvature_sigmoid).^(1+mu);
     phi=phi/max(abs(phi));
     [A,Dx,Dy]=get_stiffness_matrix_tri_wt(surf1c,f);
-    B=get_mass_matrix_tri(surf1c);    
-    normgrad_phi=sqrt((Dx*phi).^2 + (Dy*phi).^2);    
-    T2V=tri2nodes(surf1c);    
-    g_phi=-((Dx*T2V*normgrad_phi) .* (Dx*phi) + (Dy*T2V*normgrad_phi) .* (Dy*phi))./(normgrad_phi+1e-6);    
+    B=get_mass_matrix_tri(surf1c);
+    normgrad_phi=sqrt((Dx*phi).^2 + (Dy*phi).^2);
+    T2V=tri2nodes(surf1c);
+    g_phi=-((Dx*T2V*normgrad_phi) .* (Dx*phi) + (Dy*T2V*normgrad_phi) .* (Dy*phi))./(normgrad_phi+1e-6);
     g_phi=f.*(T2V*g_phi);
     M=(B+.5*dt*A);
     surf1c=surf1csm;%smooth_cortex_fast(surf1c,.2,1000);
@@ -176,10 +183,10 @@ for sul=1:length(curves1)
             phi0=get_zero_level_set(surf1c,phi);
             h=figure;
             patch('faces',surf1csm.faces,'vertices',surf1csm.vertices,'facevertexcdata',f,'facecolor','interp','edgecolor','none');
-            hold on;mysphere(phi0,.6,colr(kk,:));caxis([-.5,.5]);
-            saveas(h,[subbasename,'.',hemi,sprintf('sul_%d_f_iter_%d.fig',sul,kk)]);
-            
+            hold on;mysphere(phi0,.6,colr(kk,:));caxis([-5,5]);
             axis equal;drawnow;camlight;
+            saveas(h,[subbasename,'.',hemi,sprintf('sul_%d_f_iter_%d.png',sul,kk)]);
+            
             
         end
     end
@@ -225,12 +232,18 @@ for sul=1:length(curves1)
         curvesout{sul}=surf1co.vertices(it,:);
     end
 end
-writedfc([subbasename_tmp,'.',hemi,'.','mapped.refined.dfc'],curvesout,[subbasename_tmp,'.sulcal_protocol_HD.xml']);
-copyfile([subbasename_tmp,'.',hemi,'.','mapped.refined.dfc'],[subbasename,'.',hemi,'.','mapped.refined.dfc'],'f');
 
-if exist([subbasename,'.',hemi,'.','mapped.dfc'],'file')
-    delete([subbasename,'.',hemi,'.','mapped.dfc']);
+if tmp_files_exist
+    writedfc([subbasename_tmp,'.',hemi,'.','mapped.refined.dfc'],curvesout,[subbasename_tmp,'.sulcal_protocol_HD.xml']);
+    copyfile([subbasename_tmp,'.',hemi,'.','mapped.refined.dfc'],[subbasename,'.',hemi,'.','mapped.refined.dfc'],'f');
+else
+    writedfc([subbasename,'.',hemi,'.','mapped.refined.dfc'],curvesout,[subbasename,'.sulcal_protocol_HD.xml']);
 end
+
+% if exist([subbasename,'.',hemi,'.','mapped.dfc'],'file')
+%     delete([subbasename,'.',hemi,'.','mapped.dfc']);
+% end
+
 
 if isempty(strfind(flags,'gui'))
     disp1([hemi,' hemi sulcal refinement is done.'],'refine_sulci_hemi',flags);

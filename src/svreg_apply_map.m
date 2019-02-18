@@ -1,10 +1,20 @@
-% subjID='100206';
-% target_file='/Applications/BrainSuite15c/svreg/BrainSuiteAtlas1/mri.label.nii.gz';
-% map_file=[ subjID '.svreg.inv.map.nii.gz'];
-% data_file=[ subjID '.dwi.RAS.FA.T1_coord.nii.gz'];
-% out_file=[subjID '.fa.atlas.nii.gz'];
-% interp_type='nearest';
-% datatype=16;
+% SVReg: Surface-Constrained Volumetric Registration
+% Copyright (C) 2019 The Regents of the University of California and the University of Southern California
+% Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
+% 
+% This program is free software; you can redistribute it and/or
+% modify it under the terms of the GNU General Public License
+% as published by the Free Software Foundation; version 2.
+% 
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+% USA.
 
 function svreg_apply_map(map_file,data_file,out_file,target_file,smoothness,datatype,bitpix,interp_type)
 
@@ -18,10 +28,10 @@ end
 
 if exist('interp_type','var')
     if isempty(interp_type)
-        interp_type='natural';
+        interp_type='nearest';
     end    
 else
-    interp_type='natural';
+    interp_type='nearest';
 end
 
 if exist('bitpix','var')

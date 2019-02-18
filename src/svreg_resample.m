@@ -1,7 +1,22 @@
+% SVReg: Surface-Constrained Volumetric Registration
+% Copyright (C) 2019 The Regents of the University of California and the University of Southern California
+% Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
+% 
+% This program is free software; you can redistribute it and/or
+% modify it under the terms of the GNU General Public License
+% as published by the Free Software Foundation; version 2.
+% 
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+% GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+% USA.
+
 function svreg_resample(varargin)
-% Copyright (C) 2017 The Regents of the University of California and the
-% University of Southern California
-% Created by Anand A. Joshi ajoshi@usc.edu.
 %
 % Description:
 % This function resamples 3D or 4D input NIFTI-1 file.
@@ -49,7 +64,7 @@ if ischar(p.Results.dx)
 elseif isnumeric(p.Results.dx)
     dx=p.Results.dx;
     dy=p.Results.dy;
-    dz=p.Results.dz;        
+    dz=p.Results.dz;
 end
 dim=p.Results.dim;
 infile=p.Results.infile;outfile=p.Results.outfile;
@@ -75,6 +90,13 @@ if isempty(extrapval)
 end
 % perform the resampling
 vr=resample_vol_res(v,RES,SZ,mthd,extrapval);
+
+
+% Make the header look like BrainSuite header
+vr.hdr.hist.srow_x(1:3)=[vr.hdr.dime.pixdim(2),0,0];
+vr.hdr.hist.srow_y(1:3)=[0,vr.hdr.dime.pixdim(3),0];
+vr.hdr.hist.srow_z(1:3)=[0,0,vr.hdr.dime.pixdim(4)];
+vr.hdr.dime.scl_slope= 0;
 
 % save the output
 save_untouch_nii(vr,outfile);

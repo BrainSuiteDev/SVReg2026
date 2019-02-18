@@ -1,5 +1,5 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2017 The Regents of the University of California and the University of Southern California
+% Copyright (C) 2019 The Regents of the University of California and the University of Southern California
 % Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
 % 
 % This program is free software; you can redistribute it and/or
@@ -18,11 +18,6 @@
 
 
 function svreg_elastic_vol_reg_nonlin_cg(subbasename,subbasename_tmp,nit,regul_alpha)
-%opengl software;clear all;close all;restoredefaultpath;
-%addpath(genpath('/home/ajoshi/git_sandbox/svreg-matlab/dev'));
-%addpath(genpath('/home/ajoshi/git_sandbox/svreg-matlab/src'));
-%subbasename='C:\Users\ajoshi\Documents\git_sandbox\svreg-matlab\data2\brainsuite_subj1_m6';
-%subbasename_tmp='C:\Users\ajoshi\Documents\git_sandbox\svreg-matlab\data2\brainsuite_subj1_m6.svreg.tmp\brainsuite_subj1_m6';
 
 vs=load_nii_z([subbasename_tmp,'.surfreg.nii.gz']);vs.img=smooth3(double(vs.img),'gaussian',[9 9 9],1);
 vt=load_nii_z([subbasename,'.pvc.frac.nii.gz']);vt.img=smooth3(double(vt.img),'gaussian',[9 9 9],1);

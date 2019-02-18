@@ -2,7 +2,7 @@
 
 Surface and Volume Registration programs for use with BrainSuite-generated files. Modules compile into seperate executables for interoperability with BrainSuite's GUI or command line.
 
-Full documatation and usage of SVReg can be found at:
+Full documentation and usage of SVReg can be found at:
 http://brainsuite.org/processing/svreg/
 
 System requirement and usage can be found at:

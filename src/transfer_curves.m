@@ -1,5 +1,5 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2017 The Regents of the University of California and the University of Southern California
+% Copyright (C) 2019 The Regents of the University of California and the University of Southern California
 % Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
 % 
 % This program is free software; you can redistribute it and/or
@@ -39,7 +39,7 @@ if exist([atlasbasename,'.',hemi,'.dfc'],'file')
     %    copyfile([atlasbasename,'.right.all.dfc'],[subbasename,'.target.right.all.dfc'],'f');
     
     [at_pth,~]=fileparts(atlasbasename);
-    copyfile(fullfile(at_pth,'sulcal_protocol_HD.xml'),[subbasename,'.sulcal_protocol_HD.xml'],'f');
+%    copyfile(fullfile(at_pth,'sulcal_protocol_HD.xml'),[subbasename,'.sulcal_protocol_HD.xml'],'f');
 end
 
 sub=readdfs([subbasename,'.',hemi,'.mid.cortex.reg.dfs']);
@@ -67,5 +67,5 @@ if existfile([subbasename,'.target.',hemi,'.all.dfc'])
         %   fprintf('%d / %d\n',nCurve,hdr.nContours);
     end
     
-    writedfc([subbasename,'.',hemi,'.mapped.all.dfc'],subcurves,[subbasename,'.sulcal_protocol_all_HD.xml']);
+    writedfc([subbasename,'.',hemi,'.mapped.all.dfc'],subcurves,[subbasename,'.sulcal_protocol_HD.xml']);
 end

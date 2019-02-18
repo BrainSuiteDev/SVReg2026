@@ -77,13 +77,13 @@ else
 fi
 
 if [ $# -gt 6 ]; then
-	BITPIX=$6;
+	BITPIX=$7;
 else
 	BITPIX="32"
 fi
 
 if [ $# -gt 7 ]; then
-	INTERP=$6;
+	INTERP=$8;
 else
 	INTERP="nearest"
 fi
@@ -110,6 +110,6 @@ export DYLD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
 
-# Perform volume registration
+# Apply SVReg map to a given image
 ${exe_dir}/svreg_apply_map.app/Contents/MacOS/svreg_apply_map "${MAPFILE}" "${DATAFILE}" "${OUTFILE}" "${TARFILE}" "${SMOOTHNESS}" "${DATATYPE}" "${BITPIX}" "${INTERP}" 
 exit

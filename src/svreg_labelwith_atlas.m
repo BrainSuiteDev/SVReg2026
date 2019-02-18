@@ -1,5 +1,5 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2017 The Regents of the University of California and the University of Southern California
+% Copyright (C) 2019 The Regents of the University of California and the University of Southern California
 % Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
 % 
 % This program is free software; you can redistribute it and/or
@@ -69,13 +69,18 @@ srin.labels=sr.labels;
 srpial=readdfs([subbasename,'.right.pial.cortex.svreg.dfs']);
 srpial.labels=sr.labels;
 
-if ~exist(subbasename_tmp,'dir')
-    mkdir(subbasename_tmp);
-    p1=fileparts(subbasename);
-    p2=fileparts(subbasename_tmp);
-    copyfile(fullfile(p1,'brainsuite_labeldescription.xml'),fullfile(p2,'brainsuite_labeldescription.xml'));
-    copyfile(sprintf('%s.svreg.init.label.nii.gz',subbasename),sprintf('%s.label.surfreg.nii.gz',subbasename_tmp));    
-end
+%if ~exist(subbasename_tmp,'dir')
+mkdir(subbasename_tmp);
+p1=fileparts(subbasename);
+p1at=fileparts(atlasbasename);
+p2=fileparts(subbasename_tmp);
+copyfile(fullfile(p1at,'brainsuite_labeldescription.xml'),fullfile(p2,'brainsuite_labeldescription.xml'));
+
+xml_fname = fullfile(p1,['brainsuite_labeldescription.',postfix,'xml']);
+copyfile(fullfile(p2,'brainsuite_labeldescription.xml'),xml_fname);
+
+copyfile(sprintf('%s.svreg.init.label.nii.gz',subbasename),sprintf('%s.label.surfreg.nii.gz',subbasename_tmp));
+%end
 %subbasename_tmp=subbasename;
 slout=[subbasename_tmp,'.left.mid.cortex.reg.',postfix,'dfs'];
 srout=[subbasename_tmp,'.right.mid.cortex.reg.',postfix,'dfs'];
@@ -120,6 +125,9 @@ vsl_sub.img=interp3(vsl.img,(ymap2),(xmap2),(zmap2),'nearest',0);
 save_untouch_nii_gz(vsl_sub,sprintf('%s.svreg.%slabel.nii.gz',subbasename_tmp,postfix));
 
 svreg_refinements(subbasename,atlasbasename,postfix);
+
+copyfile(fullfile(p1at,'brainsuite_labeldescription.xml'),fullfile(p2,'brainsuite_labeldescription.xml'));
+
 
 % refine volume
 

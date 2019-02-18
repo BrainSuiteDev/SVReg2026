@@ -1,16 +1,16 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2017 The Regents of the University of California and the University of Southern California
-% Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
-% 
+% Copyright (C) 2019 The Regents of the University of California and the University of Southern California
+% Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy
+%
 % This program is free software; you can redistribute it and/or
 % modify it under the terms of the GNU General Public License
 % as published by the Free Software Foundation; version 2.
-% 
+%
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 % GNU General Public License for more details.
-% 
+%
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
@@ -21,14 +21,14 @@ function recolor_by_label(surfn,atlas_name,xmlf)
 
 surf1=readdfs(surfn);
 if ~exist('xmlf','var')
-a=fileparts(atlas_name);
-
-if exist(fullfile(a,'brainsuite_labeldescription.xml'),'file')
-    xmlfname=fullfile(a,'brainsuite_labeldescription.xml');
-else
-    xmlfname=[atlas_name,'brainsuite_labeldescription.xml'];
-end
-xmlf=xmlfname;
+    a=fileparts(atlas_name);
+    
+    if exist(fullfile(a,'brainsuite_labeldescription.xml'),'file')
+        xmlfname=fullfile(a,'brainsuite_labeldescription.xml');
+    else
+        xmlfname=[atlas_name,'brainsuite_labeldescription.xml'];
+    end
+    xmlf=xmlfname;
 end
 aaa=xml2struct(xmlf);
 
@@ -38,7 +38,11 @@ for kk=1:1:length(aaa.labelset.label)
         continue;
     end
     cl=aaa.labelset.label{kk}.Attributes.color;
-    clr{kk}=dec2hex(hex2dec(cl(3:end)),6);
+    if strcmp(cl(1:2),'0x')
+        clr{kk}=dec2hex(hex2dec(cl(3:end)),6);
+    else
+        clr{kk}=dec2hex(hex2dec(cl),6);
+    end
     id(kk)=str2num(aaa.labelset.label{kk}.Attributes.id);
 end
 

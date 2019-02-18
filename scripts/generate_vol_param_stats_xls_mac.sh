@@ -39,7 +39,7 @@ read -d '' usage <<EOF
   Authored by Anand A. Joshi, Signal and Image Processing Institute
   Department of Electrical Engineering, Viterbi School of Engineering, USC
 
-  usage: generate_vol_param_stats_xls.sh [subject fileprefix] [flags]
+  usage: generate_vol_param_stats_xls.sh subject fileprefix param_nii_file [flags]
 
   required input:
   subject fileprefix      path and filename prefix of the subject's output

@@ -75,13 +75,13 @@ else
 fi
 
 if [ $# -gt 6 ]; then
-	BITPIX=$6;
+	BITPIX=$7;
 else
 	BITPIX="32"
 fi
 
 if [ $# -gt 7 ]; then
-	INTERP=$6;
+	INTERP=$8;
 else
 	INTERP="nearest"
 fi
@@ -105,7 +105,7 @@ export LD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
 
-# Compute cortical thickness
+# Apply SVReg map to a given image
 #FLAGS="${FLAGS}r"
 ${exe_dir}/svreg_apply_map "${MAPFILE}" "${DATAFILE}" "${OUTFILE}" "${TARFILE}" "${SMOOTHNESS}" "${DATATYPE}" "${BITPIX}" "${INTERP}" 
 

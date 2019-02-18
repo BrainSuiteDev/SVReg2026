@@ -1,5 +1,5 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2017 The Regents of the University of California and the University of Southern California
+% Copyright (C) 2019 The Regents of the University of California and the University of Southern California
 % Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
 % 
 % This program is free software; you can redistribute it and/or
@@ -23,6 +23,7 @@ for jj=1:length(src_dirs)
 end
 mkdir(fullfile(out_dir,'3rdParty'));
 copyfile('../3rdParty/*.m',fullfile(out_dir,'3rdParty'));
+copyfile('../3rdParty/*.c',fullfile(out_dir,'3rdParty'));
 copyfile('../3rdParty/trilinear.cpp',fullfile(out_dir,'3rdParty'));
 mkdir(fullfile(out_dir,'3rdParty','AIR_bin'));
 copyfile('../README.md',out_dir);

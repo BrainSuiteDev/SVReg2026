@@ -31,7 +31,7 @@ fi
 
 read -d '' usage <<EOF
 
-  generate_stats_xls : calculate volumetric and surface stats (svreg)
+  generate_vol_param_stats_xls : calculate volumetric and surface stats (svreg)
   This program calculates the mean thickness, grey matter volume, white
   matter volume, CSF volume, total volume, and the cortical area of svreg's
   labeled regions of interest. It then saves the results in a csv file.
@@ -39,7 +39,7 @@ read -d '' usage <<EOF
   Authored by Anand A. Joshi, Signal and Image Processing Institute
   Department of Electrical Engineering, Viterbi School of Engineering, USC
 
-  usage: generate_vol_param_stats_xls.sh [subject fileprefix] [flags]
+  usage: generate_vol_param_stats_xls.sh subject fileprefix param_nii_file [flags]
 
   required input:
   subject fileprefix      path and filename prefix of the subject's output

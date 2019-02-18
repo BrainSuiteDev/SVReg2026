@@ -31,7 +31,7 @@ fi
 
 read -d '' usage <<EOF
 
-  svreg_smooth_vol_function : This script performs 3d vol news
+  svreg_smooth_vol_function : This script performs 3d volumetric smoothing using Gaussian kernel.
   Authored by Anand A. Joshi, Signal and Image Processing Institute
   Department of Electrical Engineering, Viterbi School of Engineering, USC
 

@@ -1,5 +1,5 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2017 The Regents of the University of California and the University of Southern California
+% Copyright (C) 2019 The Regents of the University of California and the University of Southern California
 % Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
 % 
 % This program is free software; you can redistribute it and/or
@@ -23,6 +23,26 @@ function [p, loc] =myclean_patch_cc(p)
 po=p;
 if isempty(p.faces)
     loc=[];
+    p.vertices=[];
+    if isfield(po,'vcolor')
+        p.vcolor=po.vcolor(loc,:);
+    end
+    if isfield(po,'attributes')
+        p.attributes=po.attributes(loc,:);
+    end
+    if isfield(po,'labels')
+        p.labels=po.labels(loc);
+    end
+    
+    if isfield(po,'u')
+        p.u=po.u(loc);       p.v=po.v(loc);
+    end
+    
+    if isfield(po,'normals')
+        p.normals=po.normals(loc,:);    %   p.v=po.v(loc);
+    end
+    
+    
     return;
 end
 p.faces=myclean_tri(p.faces);
@@ -36,7 +56,7 @@ p.faces=myclean_tri(p.faces);
 %    colno = [colno;conn{jj}'];
 %    datano= [datano;ones(length(conn{jj}),1)];
 %end
-%A=sparse(rowno,colno,datano); 
+%A=sparse(rowno,colno,datano);
 A=A+speye(size(A));
 
 [s,c]=scomponents(A);
@@ -44,13 +64,13 @@ len=0;lcc=0;
 for jj=1:s
     v1=find(c==jj);v=length(v1);
     if isfield(p,'labels')
-    if(median(p.labels(p.faces(v1,1)))==0)
-        continue;
-    end
+        if(median(p.labels(p.faces(v1,1)))==0)
+            continue;
+        end
     end
     
     if v>len
-    lcc=jj;len=v;
+        lcc=jj;len=v;
     end
     
 end
@@ -80,23 +100,23 @@ p.faces=p.faces(gT,:);
 
 [c,loc]=ismember(p.vertices,po.vertices,'rows');
 if sum(c)==length(p.vertices)
-   if isfield(po,'vcolor')
-       p.vcolor=po.vcolor(loc,:);
-   end
-   if isfield(po,'attributes')
-       p.attributes=po.attributes(loc,:);
-   end
-   if isfield(po,'labels')
-       p.labels=po.labels(loc);
-   end
-   
-   if isfield(po,'u')
-       p.u=po.u(loc);       p.v=po.v(loc);
-   end
-   
-   if isfield(po,'normals')
-       p.normals=po.normals(loc,:);    %   p.v=po.v(loc);
-   end
-     
-end
+    if isfield(po,'vcolor')
+        p.vcolor=po.vcolor(loc,:);
+    end
+    if isfield(po,'attributes')
+        p.attributes=po.attributes(loc,:);
+    end
+    if isfield(po,'labels')
+        p.labels=po.labels(loc);
+    end
     
+    if isfield(po,'u')
+        p.u=po.u(loc);       p.v=po.v(loc);
+    end
+    
+    if isfield(po,'normals')
+        p.normals=po.normals(loc,:);    %   p.v=po.v(loc);
+    end
+    
+end
+

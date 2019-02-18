@@ -55,6 +55,14 @@ fi
 INFILE=$1;
 ATFILE=$2;
 
+FLG=''
+
+if [ $# -gt 2 ]; then
+  echo "Surf Coloring will be done" 
+  FLG=$3;
+fi
+
+
 shift
 
 
@@ -79,5 +87,5 @@ export XAPPLRESDIR;
 
 
 # Perform volume registration
-${exe_dir}/svreg_make_atlas.app/Contents/MacOS/svreg_make_atlas "${INFILE}" "${ATFILE}" 
+${exe_dir}/svreg_make_atlas.app/Contents/MacOS/svreg_make_atlas "${INFILE}" "${ATFILE}" "${FLG}"
 exit

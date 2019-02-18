@@ -1,5 +1,5 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2017 The Regents of the University of California and the University of Southern California
+% Copyright (C) 2019 The Regents of the University of California and the University of Southern California
 % Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
 % 
 % This program is free software; you can redistribute it and/or
@@ -17,6 +17,8 @@
 % USA.
 
 function generate_vol_param_stats_xls(subbasename,param_nii_filename,varargin)
+% Generate statistics from a given volumetric parameter file
+
 
 [pth,subname,extt]=fileparts(subbasename);
 subname=strcat(subname,extt);

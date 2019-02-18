@@ -55,6 +55,12 @@ fi
 INFILE=$1;
 ATFILE=$2;
 
+FLG=''
+if [ $# -gt 2 ]; then
+  echo "Surf Coloring will be done" 
+  FLG=$3;
+fi
+
 shift
 
 
@@ -76,6 +82,6 @@ export XAPPLRESDIR;
 
 # Compute cortical thickness
 #FLAGS="${FLAGS}r"
-${exe_dir}/svreg_make_atlas "${INFILE}" "${ATFILE}" 
+${exe_dir}/svreg_make_atlas "${INFILE}" "${ATFILE}" "${FLG}" 
 
 exit

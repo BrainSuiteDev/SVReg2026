@@ -1,5 +1,5 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2017 The Regents of the University of California and the University of Southern California
+% Copyright (C) 2019 The Regents of the University of California and the University of Southern California
 % Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
 % 
 % This program is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@ end
 %  flags=strrep(flags,'-','');
 %  a=strfind(flags,'v');
 if isempty(strfind(flags,'v'))    
-     verbosity=2;
+     verbosity=0;
 else
     a=strfind(flags,'v');
     verbosity=flags(a(1)+1);   verbosity= str2double(verbosity);

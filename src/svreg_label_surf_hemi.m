@@ -1,16 +1,16 @@
 % SVReg: Surface-Constrained Volumetric Registration
-% Copyright (C) 2017 The Regents of the University of California and the University of Southern California
-% Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy 
-% 
+% Copyright (C) 2019 The Regents of the University of California and the University of Southern California
+% Created by Anand A. Joshi, Chitresh Bhushan, David W. Shattuck, Richard M. Leahy
+%
 % This program is free software; you can redistribute it and/or
 % modify it under the terms of the GNU General Public License
 % as published by the Free Software Foundation; version 2.
-% 
+%
 % This program is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
 % MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 % GNU General Public License for more details.
-% 
+%
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
@@ -40,6 +40,30 @@ end
 fprintf(fp,'\n');
 
 fclose(fp);
+
+if strcmp(hemi,'right')
+    svreg_path=fileparts(fileparts(atlasbasename));%getcurrentdir;%ctfroot;%mfilename('fullpath');
+    pth1=fileparts(subbasename_tmp);
+    save(fullfile(pth1,'svreg_path.mat'),'svreg_path');
+    atlas_name_msk_fname=[subbasename_tmp '.target.cortex.dewisp.mask.nii.gz'];
+    copyfile([atlasbasename, '.cortex.dewisp.mask.nii.gz'],atlas_name_msk_fname,'f');
+    copyfile([atlasbasename, '.bfc.nii.gz'],[subbasename_tmp,'.target.bfc.nii.gz'],'f');%
+    copyfile([atlasbasename, '.pvc.frac.nii.gz'],[subbasename_tmp,'.target.pvc.frac.nii.gz'],'f');%
+    copyfile([atlasbasename,'.hippo_carved.nii.gz'],[subbasename_tmp,'.target.hippo_carved.nii.gz'],'f');
+    atlas_labels_fname=[subbasename_tmp '.target.label.nii'];
+    copyfile([atlasbasename, '.label.nii.gz'],[atlas_labels_fname,'.gz'],'f');
+    
+    a=fileparts(atlasbasename);sa=fileparts(subbasename_tmp);
+    copyfile(fullfile(a,'brainsuite_labeldescription.xml'),fullfile(sa,'brainsuite_labeldescription.xml'),'f');
+    
+    sa=fileparts(subbasename);
+    copyfile(fullfile(a,'brainsuite_labeldescription.xml'),fullfile(sa,'brainsuite_labeldescription.xml'),'f');
+    %sa
+    
+    [at_pth,~]=fileparts(atlasbasename);
+    copyfile(fullfile(at_pth,'sulcal_protocol_HD.xml'),[subbasename_tmp,'.sulcal_protocol_HD.xml'],'f');
+    
+end
 
 
 curves_no=[];flags='';curves_name=[];
@@ -105,13 +129,15 @@ end
 if exist([atlasbasename,'.right.dfc'],'file')
     copyfile([atlasbasename,'.',hemi,'.dfc'],[subbasename_tmp,'.target.',hemi,'.dfc'],'f');
     [at_pth,~]=fileparts(atlasbasename);
-    if strcmp(hemi,'right')
-        copyfile([atlasbasename,'.warp'],[subbasename_tmp,'_atlas.warp'],'f');
-        copyfile(fullfile(at_pth,'sulcal_protocol_HD.xml'),[subbasename_tmp,'.sulcal_protocol_HD.xml'],'f');
-        if exist([atlasbasename,'.sulcal_protocol_all_HD.xml'],'file')
-            copyfile([atlasbasename,'.sulcal_protocol_all_HD.xml'],[subbasename_tmp,'.sulcal_protocol_all_HD.xml'],'f');
-        end
-    end
+     if strcmp(hemi,'right')
+          copyfile([atlasbasename,'.warp'],[subbasename_tmp,'_atlas.warp'],'f');
+%         copyfile(fullfile(at_pth,'sulcal_protocol_HD.xml'),[subbasename_tmp,'.sulcal_protocol_HD.xml'],'f');
+%         if exist([atlasbasename,'.sulcal_protocol_all_HD.xml'],'file')
+%             copyfile([atlasbasename,'.sulcal_protocol_all_HD.xml'],[subbasename_tmp,'.sulcal_protocol_all_HD.xml'],'f');
+%         else
+%             copyfile([subbasename_tmp,'.sulcal_protocol_HD.xml'],[subbasename_tmp,'.sulcal_protocol_all_HD.xml'],'f');
+%         end
+     end
     
 end
 
@@ -209,7 +235,6 @@ if ~isempty(strfind(flags,'gui'))
 else
     disp1('Transferring Curves','svreg_label_surf_hemi',flags);
 end
-transfer_curves(subbasename_tmp,atlasbasename,hemi);
 
 corr_topology_labels([subbasename_tmp,'.',hemi,'.mid.cortex.reg.dfs']);
 recolor_by_label([subbasename_tmp,'.',hemi,'.mid.cortex.reg.dfs'],atlasbasename);
@@ -227,10 +252,6 @@ if isempty(strfind(flags,'r'))
     copyfile([subbasename_tmp,'.',hemi,'.inner.cortex.reg.dfs'],[subbasename_tmp,'.',hemi,'.inner.cortex.svreg.dfs'],'f');
 end
 
-copyfile([subbasename_tmp,'.',hemi,'.mapped.dfc'],[subbasename,'.',hemi,'.mapped.dfc'],'f');
-if exist([subbasename_tmp,'.',hemi,'.mapped.all.dfc'],'file')
-    copyfile([subbasename_tmp,'.',hemi,'.mapped.all.dfc'],[subbasename,'.',hemi,'.mapped.all.dfc'],'f');
-end
 %copyfile([subbasename_tmp,'.right.mapped.dfc'],[subbasename,'.right.mapped.dfc'],'f')
 
 
@@ -248,29 +269,11 @@ else
     end
 end
 
-if strcmp(hemi,'right')
-    svreg_path=fileparts(fileparts(atlasbasename));%getcurrentdir;%ctfroot;%mfilename('fullpath');
-    pth1=fileparts(subbasename_tmp);
-    save(fullfile(pth1,'svreg_path.mat'),'svreg_path');    
-    atlas_name_msk_fname=[subbasename_tmp '.target.cortex.dewisp.mask.nii.gz'];
-    copyfile([atlasbasename, '.cortex.dewisp.mask.nii.gz'],atlas_name_msk_fname,'f');
-    copyfile([atlasbasename, '.bfc.nii.gz'],[subbasename_tmp,'.target.bfc.nii.gz'],'f');%
-    copyfile([atlasbasename, '.pvc.frac.nii.gz'],[subbasename_tmp,'.target.pvc.frac.nii.gz'],'f');%
-    copyfile([atlasbasename,'.hippo_carved.nii.gz'],[subbasename_tmp,'.target.hippo_carved.nii.gz'],'f');
-    atlas_labels_fname=[subbasename_tmp '.target.label.nii'];
-    copyfile([atlasbasename, '.label.nii.gz'],[atlas_labels_fname,'.gz'],'f');
-    
-    a=fileparts(atlasbasename);sa=fileparts(subbasename_tmp);
-    copyfile(fullfile(a,'brainsuite_labeldescription.xml'),fullfile(sa,'brainsuite_labeldescription.xml'),'f');
-    
-    sa=fileparts(subbasename);
-    copyfile(fullfile(a,'brainsuite_labeldescription.xml'),fullfile(sa,'brainsuite_labeldescription.xml'),'f');
-    %sa
-    
-    [at_pth,~]=fileparts(atlasbasename);
-    copyfile(fullfile(at_pth,'sulcal_protocol_HD.xml'),[subbasename_tmp,'.sulcal_protocol_HD.xml'],'f');
-    
+
+transfer_curves(subbasename_tmp,atlasbasename,hemi);
+
+copyfile([subbasename_tmp,'.',hemi,'.mapped.dfc'],[subbasename,'.',hemi,'.mapped.dfc'],'f');
+if exist([subbasename_tmp,'.',hemi,'.mapped.all.dfc'],'file')
+    copyfile([subbasename_tmp,'.',hemi,'.mapped.all.dfc'],[subbasename,'.',hemi,'.mapped.all.dfc'],'f');
 end
-
-
 
