@@ -198,7 +198,7 @@ void mexFunction( int nlhs, mxArray *plhs[] ,  int nrhs, const mxArray *prhs[] )
 	double *xc , *A_k;
 	
 	
-	const int  *dimsx ;
+	const mwSize  *dimsx ;
 	
 	short int numdimsx  ;
 	
@@ -607,7 +607,7 @@ void Compute_C_k(short int d , short int p ,
 		
 	}
 	
-	heads[d] = 64000;/*INT_MAX;*/
+	heads[d] = 32000;/*INT_MAX;*/
 	
 	cinds[0] = 0;
 	

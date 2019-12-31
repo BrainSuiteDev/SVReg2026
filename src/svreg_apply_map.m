@@ -67,7 +67,9 @@ end
 if ~contains(data_file,'.eig.')
     vsubjFA=load_nii_BIG_Lab(data_file);
     vAtlasFA=load_nii_BIG_Lab(target_file);vt=vAtlasFA;
-    vAtlasFA.img=interp3(single(vsubjFA.img),vMap.img(:,:,:,2),vMap.img(:,:,:,1),vMap.img(:,:,:,3),interp_type);
+    if length(size(vsubjFA.img))==3
+        vAtlasFA.img=interp3(single(vsubjFA.img),vMap.img(:,:,:,2),vMap.img(:,:,:,1),vMap.img(:,:,:,3),interp_type);
+    end
     vAtlasFA.img(isnan(vAtlasFA.img)) = 0;
     if exist('datatype','var')
         if ~isempty(datatype)

@@ -21,7 +21,7 @@ function vs=resample_vol_res(v,res_out,size_out,mthd,extrapval)
 
 % This is a helper function for svreg_resample
 
-if ~exist('method','var')
+if ~exist('mthd','var')
     mthd='linear';
 end
 

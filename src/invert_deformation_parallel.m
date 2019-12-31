@@ -44,7 +44,6 @@ inv_map{2}=inv_map{1};inv_map{3}=inv_map{1};
 clear src_mask src_mask_ind
 for jj=1:3
     inv_map{jj}(tar_mask_ind)=mygriddata3_IntNearestHack(mapx,mapy,mapz,s{jj},tX,tY,tZ);
-%    inv_map{jj}(tar_mask_ind)=griddata(mapx,mapy,mapz,s{jj},tX,tY,tZ,'nearest');
 end
 disp1('inverting map','invert_deformation');
 

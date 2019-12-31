@@ -3,23 +3,23 @@
 exe_name=$0
 exe_dir=`dirname "$0"`
 
-# If MCR R2015b is installed in a non-default location, define correct path 
+# If MCR R2019b is installed in a non-default location, define correct path 
 # on next line and uncomment it (remove the leading "#")
 #BrainSuiteMCR="/path/to/your/MCR";
 
 if [ -z "$BrainSuiteMCR" ]; then
-  if [ -e /Applications/MATLAB/MATLAB_Runtime/v90 ]; then
-    BrainSuiteMCR="/Applications/MATLAB/MATLAB_Runtime/v90"
-  elif [ -e /Applications/MATLAB_R2015b.app/runtime ]; then
-    BrainSuiteMCR="/Applications/MATLAB_R2015b.app";  
+  if [ -e /Applications/MATLAB/MATLAB_Runtime/v97 ]; then
+    BrainSuiteMCR="/Applications/MATLAB/MATLAB_Runtime/v97"
+  elif [ -e /Applications/MATLAB_R2019b.app/runtime ]; then
+    BrainSuiteMCR="/Applications/MATLAB_R2019b.app";  
   else
     echo
-    echo "Could not find Matlab 2015b with Matlab Compiler or MCR 2015b (v9.0)."
-    echo "Please install the Matlab 2015b MCR from MathWorks at:"
+    echo "Could not find Matlab 2019b with Matlab Compiler or MCR 2019b (v9.0)."
+    echo "Please install the Matlab 2019b MCR from MathWorks at:"
     echo
     echo "http://www.mathworks.com/products/compiler/mcr/"
     echo 
-    echo "If you already have Matlab 2015b with the Matlab Compiler or MCR 2015b"
+    echo "If you already have Matlab 2019b with the Matlab Compiler or MCR 2019b"
     echo "installed, please edit ${exe_name} by uncommenting and editing the line:"
     echo "#BrainSuiteMCR=\"/path/to/your/MCR\";"
     echo "(replacing /path/to/your/MCR with the path to your Matlab or MCR installation)"
@@ -43,7 +43,7 @@ read -d '' usage <<EOF
 EOF
 
 # Parse inputs
-if [ $# -lt 2 ]; then
+if [ $# -lt 5 ]; then
   echo
   echo "$usage";
   echo
@@ -52,6 +52,9 @@ fi
 
 FILEPREFIX=$1;
 ATLASPREFIX=$2;
+SX=$3
+SY=$4
+SZ=$5
 
 # Set up path for MCR applications.
 DYLD_LIBRARY_PATH=.:${BrainSuiteMCR}/runtime/maci64 ;
@@ -62,5 +65,5 @@ export DYLD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
 # Prepare files for svreg sequence
-${exe_dir}/svreg_get_mni_tal.app/Contents/MacOS/svreg_get_mni_tal "${FILEPREFIX}" "${ATLASPREFIX}"
+${exe_dir}/svreg_get_mni_tal.app/Contents/MacOS/svreg_get_mni_tal "${FILEPREFIX}" "${ATLASPREFIX}" "${SX}" "${SY}" "${SZ}"
 exit

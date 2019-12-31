@@ -18,5 +18,7 @@
 
 
 function temp_fname=get_rand_fname()
-workdir = tempname(); mkdir(workdir);
-temp_fname = fullfile(workdir, [Random_String(16)]);
+temp_fname = tempname();% mkdir(workdir);
+%temp_fname = fullfile(workdir, [Random_String(16)]);
+
+

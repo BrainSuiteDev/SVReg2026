@@ -117,5 +117,10 @@ vt.hdr.dime.dim(1)=4;vt.hdr.dime.dim(5)=3;
 map=vt.img;
 save([outfile,'_AIR.mat'],'map');
 
-
+delete([x_fname,'.hdr']);delete([x_fname,'.img']);delete([x_fname,'.mat'])
+delete([y_fname,'.hdr']);delete([y_fname,'.img']);delete([y_fname,'.mat'])
+delete([z_fname,'.hdr']);delete([z_fname,'.img']);delete([z_fname,'.mat'])
+delete([xw_fname,'.hdr']);delete([xw_fname,'.img']);delete([xw_fname,'.mat'])
+delete([yw_fname,'.hdr']);delete([yw_fname,'.img']);delete([yw_fname,'.mat'])
+delete([zw_fname,'.hdr']);delete([zw_fname,'.img']);delete([zw_fname,'.mat'])
 

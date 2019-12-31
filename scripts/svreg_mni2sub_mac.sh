@@ -3,7 +3,7 @@
 exe_name=$0
 exe_dir=`dirname "$0"`
 
-# If MCR R2015a is installed in a non-default location, define correct path 
+# If MCR R2019b is installed in a non-default location, define correct path 
 # on next line and uncomment it (remove the leading "#")
 #BrainSuiteMCR="/path/to/your/MCR";
 
@@ -14,7 +14,7 @@ if [ -z "$BrainSuiteMCR" ]; then
     BrainSuiteMCR="/Applications/MATLAB_R2019b.app";  
   else
     echo
-    echo "Could not find Matlab 2019b with Matlab Compiler or MCR 2019b (v90)."
+    echo "Could not find Matlab 2019b with Matlab Compiler or MCR 2019b (v9.0)."
     echo "Please install the Matlab 2019b MCR from MathWorks at:"
     echo
     echo "http://www.mathworks.com/products/compiler/mcr/"
@@ -29,32 +29,32 @@ if [ -z "$BrainSuiteMCR" ]; then
   fi
 fi
 
-
 read -d '' usage <<EOF
 
-  gui_bias_correct.sh : gui bias-field correction (svreg)
-  This program allows you to manually correct the bias-field in images that
-  require it. It uses the tissue classification results of BrainSuite and
-  thus requires the Cortical Extraction Sequence to be run through tissue
-  classification.
-
-  For more information, please see 
-  http://neuroimage.usc.edu/neuro/Resources/bfc_correction_tool
-
+  svreg_mni2sub : Usage: svreg_mni2sub.exe subbasename map_or_atlasbasename mx my mz
+  subbasename: subjects base name
+  map_or_atlasbasename: atlas base name or mni2bci map file  
+  mx,my,mz: xyz MNI coordinates
   Authored by Anand A. Joshi, Signal and Image Processing Institute
   Department of Electrical Engineering, Viterbi School of Engineering, USC
 
-  usage: gui_bias_correct.sh
+  usage: svreg_mni2sub.sh [subject fileprefix] [atlas fileprefix or map name] [mx] [my] [mz]
 
 EOF
 
 # Parse inputs
-if [ $# -gt 0 ]; then
+if [ $# -lt 5 ]; then
   echo
   echo "$usage";
   echo
   exit;
 fi
+
+FILEPREFIX=$1;
+ATLASPREFIX=$2;
+MX=$3
+MY=$4
+MZ=$5
 
 # Set up path for MCR applications.
 DYLD_LIBRARY_PATH=.:${BrainSuiteMCR}/runtime/maci64 ;
@@ -64,6 +64,6 @@ XAPPLRESDIR=${BrainSuiteMCR}/X11/app-defaults ;
 export DYLD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
-# Open GUI Bias-Field Correction Tool
-${exe_dir}/gui_bias_correct.app/Contents/MacOS/gui_bias_correct
+# 
+${exe_dir}/svreg_mni2sub.app/Contents/MacOS/svreg_mni2sub "${FILEPREFIX}" "${ATLASPREFIX}" "${MX}" "${MY}" "${MZ}"
 exit

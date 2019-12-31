@@ -8,10 +8,10 @@ exe_dir=`dirname "$0"`
 #BrainSuiteMCR="/path/to/your/MCR";
 
 if [ -z "$BrainSuiteMCR" ]; then
-  if [ -e /Applications/MATLAB/MATLAB_Runtime/v97 ]; then
-    BrainSuiteMCR="/Applications/MATLAB/MATLAB_Runtime/v97"
-  elif [ -e /Applications/MATLAB_R2019b.app/runtime ]; then
-    BrainSuiteMCR="/Applications/MATLAB_R2019b.app";  
+  if [ -e /usr/local/MATLAB/MATLAB_Runtime/v97 ]; then
+    BrainSuiteMCR="/usr/local/MATLAB/MATLAB_Runtime/v97";
+  elif [ -e /usr/local/MATLAB/R2019b/runtime ]; then
+    BrainSuiteMCR="/usr/local/MATLAB/R2019b";
   else
     echo
     echo "Could not find Matlab 2019b with Matlab Compiler or MCR 2019b (v9.7)."
@@ -31,51 +31,45 @@ fi
 
 read -d '' usage <<EOF
 
+  svreg_mni2sub : Usage: svreg_mni2sub.exe subbasename map_or_atlasbasename mx my mz
+  subbasename: subjects base name
+  map_or_atlasbasename: atlas base name or mni2bci map file  
+  mx,my,mz: xyz MNI coordinates
   Authored by Anand A. Joshi, Signal and Image Processing Institute
   Department of Electrical Engineering, Viterbi School of Engineering, USC
 
- Description:
- This function creates labels using a different atlas. This function works 
- only for BCI-DNI, USCBrain and USCLobes atlases. Since the underlying 
- anatomy is the same, you can process data using one brain and use it with 
- another one
-
- Usage:
- svreg_labelwith_atlas.sh subbasename atlasbasename postfix
- 
- three arguments are required
-
- Arguments:
- subbasename: subject basename
- atlasbasename: atlas basename
- postfix: postfix
-
+  usage: svreg_mni2sub.sh [subject fileprefix] [atlas fileprefix or map name] [mx] [my] [mz]
 
 EOF
 
 # Parse inputs
-if [ $# -lt 3 ]; then
+if [ $# -lt 5 ]; then
   echo
   echo "$usage";
   echo
   exit;
 fi
 
-
-shift
-
-
+FILEPREFIX=$1;
+ATLASPREFIX=$2;
+MX=$3
+MY=$4
+MZ=$5
 
 # Set up path for MCR applications.
-DYLD_LIBRARY_PATH=.:${BrainSuiteMCR}/runtime/maci64 ;
-DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:${BrainSuiteMCR}/bin/maci64 ;
-DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:${BrainSuiteMCR}/sys/os/maci64;
+LD_LIBRARY_PATH=.:${BrainSuiteMCR}/runtime/glnxa64 ;
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${BrainSuiteMCR}/bin/glnxa64 ;
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${BrainSuiteMCR}/sys/os/glnxa64;
+MCRJRE=${BrainSuiteMCR}/sys/java/jre/glnxa64/jre/lib/amd64 ;
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${MCRJRE}/native_threads ; 
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${MCRJRE}/server ;
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${MCRJRE}/client ;
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${MCRJRE} ;  
 XAPPLRESDIR=${BrainSuiteMCR}/X11/app-defaults ;
-export DYLD_LIBRARY_PATH;
+export LD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
-
-# Change the atlas
-${exe_dir}/svreg_labelwith_atlas.app/Contents/MacOS/svreg_labelwith_atlas "$@" 
+# 
+${exe_dir}/svreg_mni2sub "${FILEPREFIX}" "${ATLASPREFIX}" "${MX}" "${MY}" "${MZ}"
 
 exit

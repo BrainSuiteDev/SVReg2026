@@ -25,9 +25,9 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[] )
 mwSize  ndims, ndims1;int i,j,k;
 const mwSize *dims, *dims1;
 double *in1,*in2, *in3,*in4, *out;
-    int position, npos, prod, prod2, izx, izy, izz;
+    size_t position, npos, prod, prod2, izx, izy, izz;
     double row, col, lay, xd, yd, zd, i1, i2, j1, j2, w1, w2;
-int rows1, cols1, lyrs1, rows2, cols2, lyrs2;
+size_t rows1, cols1, lyrs1, rows2, cols2, lyrs2;
 // Check number of arguments
 if (nrhs != 4) {
     mexErrMsgTxt("Trilinear requires four input arguments.");
@@ -79,7 +79,7 @@ if (mxIsDouble(prhs[0]) && mxIsDouble(prhs[1]) && mxIsDouble(prhs[2]) && mxIsDou
             row=in3[position]-1;
             lay=in4[position]-1;
             
-            if ( row>=0 & row<=(rows1-1) & col>=0 & col<=(cols1-1) & lay>=0 & lay<=(lyrs1-1) ) {                
+            if ( (row>=0) & (row<=(rows1-1)) & (col>=0) & (col<=(cols1-1)) & (lay>=0) & (lay<=(lyrs1-1)) ) {                
                 xd = col-(int)(col); izx=(xd != 0);
                 yd = row-(int)(row); izy=(yd != 0);
                 zd = lay-(int)(lay); izz=(zd != 0);

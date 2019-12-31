@@ -182,7 +182,7 @@ void mexFunction( int nlhs, mxArray *plhs[] , int nrhs, const mxArray *prhs[] )
 	
 	short int d , pd , K , Ny;
 
-	const int  *dimsxc , *dimsA_k , *dimsy;
+	const mwSize  *dimsxc , *dimsA_k , *dimsy;
 		
 	short int numdimsxc , numdimsA_k , numdimsy ;
 		
