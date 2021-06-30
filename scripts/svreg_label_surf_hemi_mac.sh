@@ -81,7 +81,7 @@ while [ $# -gt 0 ]; do
   IS_FLAG=`echo "$token" | grep -q '^-' && echo "T"`;
   
   if [ "$IS_FLAG" = "T" ]; then 
-    FLAGS="${FLAGS} ${token}";
+    FLAGS="$FLAGS${FLAGS:+ }$token"
   fi
   shift
 done
@@ -96,7 +96,7 @@ export PATH;
 export DYLD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
-# Perform surface registration
-${exe_dir}/svreg_label_surf_hemi.app/Contents/MacOS/svreg_label_surf_hemi "${FILEPREFIX}" "${ATLASPREFIX}" "${HEMI}" "${FLAGS}"
+[[ "$SVREG_EXEC" != "exec" ]] &&  SVREG_EXEC=;
+$SVREG_EXEC "${exe_dir}"/svreg_label_surf_hemi.app/Contents/MacOS/svreg_label_surf_hemi "${FILEPREFIX}" "${ATLASPREFIX}" "${HEMI}" "${FLAGS}"
 exit
 

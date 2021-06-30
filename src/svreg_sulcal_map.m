@@ -20,6 +20,17 @@ function svreg_sulcal_map(subbasename,atlasbasename,xmlf,xmlc,dist_thr)
 % areas.
 % The outputs are saved in [subbasename,'.',hemi,'.mid.cortex.sulci.dfs']
 % and [subbasename,'.sulci.label.nii.gz']
+subbasename = remove_extn_basename(subbasename);
+atlasbasename = remove_extn_basename(atlasbasename);
+
+[pth,subname,extt]=fileparts(subbasename);
+if isempty(pth)
+    pth=pwd();
+    subbasename=fullfile(pth,subname,extt);
+end
+
+subname=strcat(subname,extt);
+
 
 %% Check if XML file with sulci is present, if not copy it.
 if ~exist('xmlf','var') || ~exist(xmlf,'file')

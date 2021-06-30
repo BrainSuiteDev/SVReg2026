@@ -19,6 +19,17 @@
 
 function svreg_mni2sub(subbasename,mni2bci_map, mx,my,mz)
 
+
+subbasename = remove_extn_basename(subbasename);
+
+[pth,subname,extt]=fileparts(subbasename);
+if isempty(pth)
+    pth=pwd();
+    subbasename=fullfile(pth,subname,extt);
+end
+
+subname=strcat(subname,extt);
+
 if ~exist('mz','var')
     disp('Usage: svreg_mni2sub.exe subbasename map_or_atlasbasename mx my mz');
     disp('where mx my mz are the xyz in MNI coordinates (voxel 79, 113, 51 are center of MNI atlas)');

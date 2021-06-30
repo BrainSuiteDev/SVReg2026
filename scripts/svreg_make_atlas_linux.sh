@@ -80,8 +80,7 @@ export LD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
 
-# Compute cortical thickness
-#FLAGS="${FLAGS}r"
-${exe_dir}/svreg_make_atlas "${INFILE}" "${ATFILE}" "${FLG}" 
+[[ "$SVREG_EXEC" != "exec" ]] &&  SVREG_EXEC=;
+$SVREG_EXEC "${exe_dir}"/svreg_make_atlas "${INFILE}" "${ATFILE}" "${FLG}" 
 
 exit

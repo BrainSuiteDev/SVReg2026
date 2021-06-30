@@ -115,7 +115,7 @@ if isdeployed
        fprintf('Using Executable %s\n',exename);
        unix(sprintf('"%s" "%s" "%s" "%s"',exename,air_file_surf1,[surf1.name(1:end-3),'ucf'],[surf1.name(1:end-4),'_wrpd.','ucf']));
        unix(sprintf('"%s" "%s" "%s" "%s"',exename,air_file_surf2,[surf2.name(1:end-3),'ucf'],[surf2.name(1:end-4),'_wrpd.','ucf']));
-   else isunix
+   else %isunix
       exename=fullfile(pth1,'bin/warp_points_linux');
       fprintf('Using Executable %s\n',exename);
       unix(sprintf('"%s" "%s" "%s" "%s"',exename,air_file_surf1,[surf1.name(1:end-3),'ucf'],[surf1.name(1:end-4),'_wrpd.','ucf']));
@@ -132,7 +132,7 @@ else
        fprintf('Using Executable %s\n',exename);
        unix(sprintf('"%s" "%s" "%s" "%s"',exename,air_file_surf1,[surf1.name(1:end-3),'ucf'],[surf1.name(1:end-4),'_wrpd.','ucf']));
        unix(sprintf('"%s" "%s" "%s" "%s"',exename,air_file_surf2,[surf2.name(1:end-3),'ucf'],[surf2.name(1:end-4),'_wrpd.','ucf']));
-   else isunix
+   else %isunix
       exename=fullfile(pth1,'3rdParty/AIR_bin/warp_points_linux');
       fprintf('Using Executable %s\n',exename); 
       unix(sprintf('"%s" "%s" "%s" "%s"',exename,air_file_surf1,[surf1.name(1:end-3),'ucf'],[surf1.name(1:end-4),'_wrpd.','ucf']));
@@ -276,13 +276,13 @@ if isdeployed
        exename=fullfile(pth1,'bin/register_cc_curve.sh');
       %exename='register_cc_curve.sh';
       unix(sprintf('"%s" "%s"',exename,surf2.name));
-   else isunix
+   else %isunix
       exename=fullfile(pth1,'bin/register_cc_curve.sh');
       %exename='register_cc_curve.sh';
       unix(sprintf('"%s" "%s"',exename,surf2.name));
    end
 else
-   register_cc_curve(surf2.name)
+   register_cc_curve(surf2.name);
 end
 
 load(sprintf('%s_out_register_cc.mat',surf2.name));

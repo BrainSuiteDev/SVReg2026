@@ -76,7 +76,7 @@ XAPPLRESDIR=${BrainSuiteMCR}/X11/app-defaults ;
 export LD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
-# Prepare files for svreg sequence
-${exe_dir}/svreg_prepare_files "${FILEPREFIX}" "${ATLASPREFIX}"
+[[ "$SVREG_EXEC" != "exec" ]] &&  SVREG_EXEC=;
+$SVREG_EXEC "${exe_dir}"/svreg_prepare_files "${FILEPREFIX}" "${ATLASPREFIX}"
 
 exit

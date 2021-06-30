@@ -96,7 +96,7 @@ while [ $# -gt 0 ]; do
   IS_FLAG=`echo "$token" | grep -q '^-' && echo "T"`;
   
   if [ "$IS_FLAG" = "T" ]; then 
-    FLAGS="${FLAGS} ${token}";
+    FLAGS="$FLAGS${FLAGS:+ }$token"
   fi
   shift
 done
@@ -110,6 +110,6 @@ export DYLD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
 
-# Apply SVReg map to a given image
-${exe_dir}/svreg_apply_map.app/Contents/MacOS/svreg_apply_map "${MAPFILE}" "${DATAFILE}" "${OUTFILE}" "${TARFILE}" "${SMOOTHNESS}" "${DATATYPE}" "${BITPIX}" "${INTERP}" 
+[[ "$SVREG_EXEC" != "exec" ]] &&  SVREG_EXEC=;
+$SVREG_EXEC "${exe_dir}"/svreg_apply_map.app/Contents/MacOS/svreg_apply_map "${MAPFILE}" "${DATAFILE}" "${OUTFILE}" "${TARFILE}" "${SMOOTHNESS}" "${DATATYPE}" "${BITPIX}" "${INTERP}" 
 exit

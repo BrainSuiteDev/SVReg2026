@@ -19,6 +19,18 @@
 
 function svreg_get_mni_tal(subbasename,atlasbasename,sx,sy,sz)
 
+subbasename = remove_extn_basename(subbasename);
+atlasbasename = remove_extn_basename(atlasbasename);
+
+[pth,subname,extt]=fileparts(subbasename);
+if isempty(pth)
+    pth=pwd();
+    subbasename=fullfile(pth,subname,extt);
+end
+
+subname=strcat(subname,extt);
+
+
 if ~exist('sz','var')
     disp('Usage: svreg_get_mni_tal.exe subbasename atlasbasename sx sy sz');
     disp('where sx sy sz are the xyz of subject in voxel coordinates');

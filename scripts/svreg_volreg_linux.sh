@@ -75,7 +75,7 @@ while [ $# -gt 0 ]; do
   IS_FLAG=`echo "$token" | grep -q '^-' && echo "T"`;
   
   if [ "$IS_FLAG" = "T" ]; then 
-    FLAGS="${FLAGS} ${token}";
+    FLAGS="$FLAGS${FLAGS:+ }$token"
   fi
   shift
 done
@@ -94,7 +94,7 @@ export LD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
 
-# Perform volume registration
-${exe_dir}/svreg_volreg "${FILEPREFIX}" "${ATLASPREFIX}" "${FLAGS}"
+[[ "$SVREG_EXEC" != "exec" ]] &&  SVREG_EXEC=;
+$SVREG_EXEC "${exe_dir}"/svreg_volreg "${FILEPREFIX}" "${ATLASPREFIX}" "${FLAGS}"
 
 exit

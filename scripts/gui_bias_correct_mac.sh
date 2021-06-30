@@ -64,6 +64,6 @@ XAPPLRESDIR=${BrainSuiteMCR}/X11/app-defaults ;
 export DYLD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
-# Open GUI Bias-Field Correction Tool
-${exe_dir}/gui_bias_correct.app/Contents/MacOS/gui_bias_correct
+[[ "$SVREG_EXEC" != "exec" ]] &&  SVREG_EXEC=;
+$SVREG_EXEC "${exe_dir}"/gui_bias_correct.app/Contents/MacOS/gui_bias_correct
 exit

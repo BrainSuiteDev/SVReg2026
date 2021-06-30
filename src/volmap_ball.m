@@ -20,6 +20,42 @@
 
 function ret=volmap_ball(basename,resample_factor,varargin)
 
+basename = remove_extn_basename(basename);
+
+[pth,subname,extt]=fileparts(basename);
+if isempty(pth)
+    pth=pwd();
+    basename=fullfile(pth,subname,extt);
+end
+
+if ~exist('resample_factor','var')
+    resample_factor=1;
+else
+    if ischar(resample_factor)
+        resample_factor=str2double(resample_factor);
+    end
+end
+
+
+%% Output a log
+[pth,subname,extt]=fileparts(basename);
+base_log = fullfile(pth,[strrep(subname,'.target','')]);
+logfname=[base_log,'.svreg.log'];
+fp=fopen(logfname,'a+');
+t = datestr(datetime('now'));
+fprintf(fp,'%s:',t);
+[svreg_version,svreg_build] = get_svreg_version(basename);
+fprintf(fp,'SVReg %s(%s):',svreg_version,svreg_build);
+fprintf(fp,'volmap_ball %s %g ',basename, resample_factor);
+for jjj=1:length(varargin)
+    fprintf(fp,'%s ',varargin{jjj});
+end
+fprintf(fp,'\n');
+
+fclose(fp);
+%%
+
+
 [pth,subname,extt]=fileparts(basename);
 subname=strcat(subname,extt);
 tmpdir=fullfile(pth,[strrep(subname,'.target',''),'.svreg.tmp']);
@@ -30,23 +66,7 @@ if strfind(basename,'target')
 basename=subbasename_tmp;
 end
 
-if ~exist('resample_factor','var')
-    resample_factor=1;
-else
-    if ischar(resample_factor)
-        resample_factor=str2double(resample_factor);
-    end
-end
-logfname=[subbasename_tmp,'.svreg.log'];
-logfname=strrep(logfname,'target.','');
 
-fp=fopen(logfname,'a+');
-fprintf(fp,'volmap_ball %s %d ',basename,resample_factor);
-for jjj=1:length(varargin)
-    fprintf(fp,'%s ',varargin{jjj});
-end
-fprintf(fp,'\n');
-fclose(fp);
 ret='True';
 
 flags='';

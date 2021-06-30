@@ -20,23 +20,39 @@
 
 function generate_stats_xls(subbasename,varargin)
 
+subbasename = remove_extn_basename(subbasename);
+
 [pth,subname,extt]=fileparts(subbasename);
+
+if isempty(pth)
+    pth=pwd();
+    subbasename=fullfile(pth,subname,extt);
+end
+
 subname=strcat(subname,extt);
 tmpdir=fullfile(pth,[subname,'.svreg.tmp']);
-if ~exist(tmpdir,'dir')
-    subbasename_tmp=subbasename;
-else
-    subbasename_tmp=fullfile(tmpdir,subname);
-end
-logfname=[subbasename_tmp,'.svreg.log'];
+%if ~exist(tmpdir,'dir')
+%    subbasename=subbasename;
+%else
+%    subbasename=fullfile(tmpdir,subname);
+%end
+
+%% Output a log
+logfname=[subbasename,'.svreg.log'];
 fp=fopen(logfname,'a+');
-fprintf(fp,'generate_stats_xls %s ',subbasename);
+t = datestr(datetime('now'));
+fprintf(fp,'%s:',t);
+[svreg_version,svreg_build] = get_svreg_version(subbasename);
+fprintf(fp,'SVReg %s(%s):',svreg_version,svreg_build);
+
+fprintf(fp,'generate_stats_xls %s',subbasename);
 for jjj=1:length(varargin)
     fprintf(fp,'%s ',varargin{jjj});
 end
 fprintf(fp,'\n');
 
 fclose(fp);
+%%
 
 
 flags='';
@@ -50,26 +66,41 @@ else
     verbosity=flags(a(1)+1);   verbosity= str2double(verbosity);
 end
 
-if existfile([subbasename_tmp,'.svreg.corr.label.nii.gz']) || existfile([subbasename_tmp,'.svreg.label.nii.gz'])
+if existfile([subbasename,'.svreg.corr.label.nii.gz']) || existfile([subbasename,'.svreg.label.nii.gz'])
     
     if contains(flags,'r')
-        vl=load_nii_z([subbasename_tmp,'.svreg.corr.label.nii']);
+        vl=load_nii_z([subbasename,'.svreg.corr.label.nii']);vl.img=mod(vl.img,1000);
     else
-        vl=load_nii_z([subbasename_tmp,'.svreg.label.nii']);vl.img=mod(vl.img,1000);
+        vl=load_nii_z([subbasename,'.svreg.label.nii']);vl.img=mod(vl.img,1000);
     end
     
 end
 
-if existfile([subbasename_tmp,'.svreg.corr.manual.label.nii.gz'])
-    vl=load_nii_z([subbasename_tmp,'.svreg.corr.manual.label.nii']);
+if existfile([subbasename,'.svreg.corr.manual.label.nii.gz'])
+    vl=load_nii_z([subbasename,'.svreg.corr.manual.label.nii']);
 end
 % Read atlas and use the list of labels from the atlas
-if exist([subbasename_tmp '.target.label.nii.gz'],'file')
-    vl_atlas=load_nii_z([subbasename_tmp '.target.label.nii.gz']);
+
+if exist([subbasename '.target.label.nii.gz'],'file')
+    vl_atlas=load_nii_z([subbasename '.target.label.nii.gz']);
 else
-    vl_atlas=vl;
+    if exist('vl','var')
+        vl_atlas=vl;
+    else
+        vl_atlas.img = [];
+    end
 end
-labs= unique(vl_atlas.img(:)); 
+
+pth = fileparts(subbasename);
+roilist_file = fullfile(pth,'roi_list_svreg.txt');
+
+if existfile(roilist_file)
+    labs = roilist_from_file(roilist_file);
+    labs = setdiff(labs,2000); % The WM is not a meaningful roi
+else    
+    labs = unique(vl_atlas.img(:));
+end
+
 labs = union([1,2,3],setdiff(labs,0));
 
 % labs=[1,2,3,120,121,130,131,142,143,144,145,146,147,150,151,...
@@ -82,27 +113,38 @@ labs = union([1,2,3],setdiff(labs,0));
 %     660,661,662,663,670,671,680,681,690,691,701,710,720,721,740,760,780,800,850,900];
 
 
-l=readdfs([subbasename_tmp,'.left.mid.cortex.svreg.dfs']);
-r=readdfs([subbasename_tmp,'.right.mid.cortex.svreg.dfs']);
-li=readdfs([subbasename_tmp,'.left.inner.cortex.svreg.dfs']);
-ri=readdfs([subbasename_tmp,'.right.inner.cortex.svreg.dfs']);
-lp=readdfs([subbasename_tmp,'.left.pial.cortex.svreg.dfs']);
-rp=readdfs([subbasename_tmp,'.right.pial.cortex.svreg.dfs']);
-if existfile([subbasename_tmp,'.right.pial.cortex.manual.svreg.dfs'])&& existfile([subbasename_tmp,'.right.mid.cortex.manual.svreg.dfs'])&& existfile([subbasename,'.right.inner.cortex.manual.svreg.dfs'])
-    l=readdfs([subbasename_tmp,'.left.mid.cortex.manual.svreg.dfs']);
-    r=readdfs([subbasename_tmp,'.right.mid.cortex.manual.svreg.dfs']);
-    li=readdfs([subbasename_tmp,'.left.inner.cortex.manual.svreg.dfs']);
-    ri=readdfs([subbasename_tmp,'.right.inner.cortex.manual.svreg.dfs']);
-    lp=readdfs([subbasename_tmp,'.left.pial.cortex.manual.svreg.dfs']);
-    rp=readdfs([subbasename_tmp,'.right.pial.cortex.manual.svreg.dfs']);
+l=readdfs([subbasename,'.left.mid.cortex.svreg.dfs']);
+r=readdfs([subbasename,'.right.mid.cortex.svreg.dfs']);
+li=readdfs([subbasename,'.left.inner.cortex.svreg.dfs']);
+ri=readdfs([subbasename,'.right.inner.cortex.svreg.dfs']);
+lp=readdfs([subbasename,'.left.pial.cortex.svreg.dfs']);
+rp=readdfs([subbasename,'.right.pial.cortex.svreg.dfs']);
+if existfile([subbasename,'.right.pial.cortex.manual.svreg.dfs'])&& existfile([subbasename,'.right.mid.cortex.manual.svreg.dfs'])&& existfile([subbasename,'.right.inner.cortex.manual.svreg.dfs'])
+    l=readdfs([subbasename,'.left.mid.cortex.manual.svreg.dfs']);
+    r=readdfs([subbasename,'.right.mid.cortex.manual.svreg.dfs']);
+    li=readdfs([subbasename,'.left.inner.cortex.manual.svreg.dfs']);
+    ri=readdfs([subbasename,'.right.inner.cortex.manual.svreg.dfs']);
+    lp=readdfs([subbasename,'.left.pial.cortex.manual.svreg.dfs']);
+    rp=readdfs([subbasename,'.right.pial.cortex.manual.svreg.dfs']);
 end
 
-% if thicknessPVC has been run then use thickness values from that.
+% If could not read enough labels (less than 5), read them from the surfaces
+if length(labs)<5 
+    labs = union(labs,l.labels);
+    labs = union(labs,r.labels);
+    labs = union([1,2,3],setdiff(labs,0));
+end
+
+% if thicknessPVC has been run then use thickness values from the corresponding surface files.
 if existfile([subbasename,'.pvc-thickness_0-6mm.right.mid.cortex.dfs'])
     r_th=readdfs([subbasename,'.pvc-thickness_0-6mm.right.mid.cortex.dfs']);
     r.attributes=r_th.attributes;
     l_th=readdfs([subbasename,'.pvc-thickness_0-6mm.left.mid.cortex.dfs']);
     l.attributes=l_th.attributes;
+else
+    disp1('PVC Thickness is not available. Making roiwise thickness values NAN');
+    r.attributes = nan(size(r.vertices,1),1); 
+    l.attributes = nan(size(l.vertices,1),1);    
 end
 
 
@@ -157,7 +199,7 @@ csfv=zeros(length(labs),1);
 wmv=zeros(length(labs),1);
 totv=zeros(length(labs),1);
 
-if existfile([subbasename_tmp,'.svreg.corr.label.nii.gz']) || existfile([subbasename_tmp,'.svreg.label.nii.gz']) || existfile([subbasename_tmp,'.svreg.corr.manual.label.nii.gz'])
+if existfile([subbasename,'.svreg.corr.label.nii.gz']) || existfile([subbasename,'.svreg.label.nii.gz']) || existfile([subbasename,'.svreg.corr.manual.label.nii.gz'])
     for jj=1:length(labs)
         ind=(vl.img==labs(jj)); 
         gmv(jj)=sum(vgm.img(ind))*vl.hdr.dime.pixdim(2)*vl.hdr.dime.pixdim(3)*vl.hdr.dime.pixdim(4);
@@ -176,12 +218,12 @@ if existfile([subbasename_tmp,'.svreg.corr.label.nii.gz']) || existfile([subbase
         labs_vol(jj)=length(ind)*vl.hdr.dime.pixdim(2)*vl.hdr.dime.pixdim(3)*vl.hdr.dime.pixdim(4);
     end
 end
-if existfile([subbasename_tmp,'.right.pial.cortex.manual.svreg.dfs'])&& existfile([subbasename_tmp,'.right.mid.cortex.manual.svreg.dfs'])&& existfile([subbasename_tmp,'.right.inner.cortex.manual.svreg.dfs'])
-    fp=fopen([subbasename_tmp,'.roiwise.manual.stats.txt'],'w');
+if existfile([subbasename,'.right.pial.cortex.manual.svreg.dfs'])&& existfile([subbasename,'.right.mid.cortex.manual.svreg.dfs'])&& existfile([subbasename,'.right.inner.cortex.manual.svreg.dfs'])
+    fp=fopen([subbasename,'.roiwise.manual.stats.txt'],'w');
 else
-    fp=fopen([subbasename_tmp,'.roiwise.stats.txt'],'w');
+    fp=fopen([subbasename,'.roiwise.stats.txt'],'w');
 end
-if existfile([subbasename_tmp,'.svreg.corr.label.nii.gz']) || existfile([subbasename_tmp,'.svreg.label.nii.gz'])
+if existfile([subbasename,'.svreg.corr.label.nii.gz']) || existfile([subbasename,'.svreg.label.nii.gz'])
     
     fprintf(fp,'ROI_ID\tMean_Thickness(mm)\tGM_Volume(mm^3)\tCSF_Volume(mm^3)\tWM_Volume(mm^3)\tTotal_Volume(GM+WM)(mm^3)\tCortical_Area_mid(mm^2)\tCortical_Area_inner(mm^2)\tCortical_Area_pial(mm^2)\n');
     for jj=1:length(labs)
@@ -195,14 +237,10 @@ else
     
 end
 
-if existfile([subbasename_tmp,'.svreg.corr.label.nii.gz']) || existfile([subbasename_tmp,'.svreg.label.nii.gz'])
+if existfile([subbasename,'.svreg.corr.label.nii.gz']) || existfile([subbasename,'.svreg.label.nii.gz'])
     
     for jj=1:length(labs_sub)
             fprintf(fp,'%d\t%.6f\t%.6f\t%.6f\t%.6f\t%.6f\n',labs_sub(jj),0,0,0,0,labs_vol(jj));
     end
 end
 fclose(fp);
-if ~strcmp(subbasename_tmp,subbasename)
-    copyfile([subbasename_tmp,'.roiwise.stats.txt'],[subbasename,'.roiwise.stats.txt'],'f')
-    copyfile([subbasename_tmp,'.svreg.log'],[subbasename,'.svreg.log'],'f');
-end

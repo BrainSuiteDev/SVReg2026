@@ -81,8 +81,7 @@ export LD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
 
-# Compute cortical thickness
-#FLAGS="${FLAGS}r"
-${exe_dir}/svreg_smooth_surf_function "${INFILE}" "${FUNCFILE}" "${OUTFILE}" "${PARAM}"
+[[ "$SVREG_EXEC" != "exec" ]] &&  SVREG_EXEC=;
+$SVREG_EXEC "${exe_dir}"/svreg_smooth_surf_function "${INFILE}" "${FUNCFILE}" "${OUTFILE}" "${PARAM}"
 
 exit

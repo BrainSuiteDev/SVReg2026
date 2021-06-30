@@ -20,7 +20,16 @@
 
 function svreg(subbasename,atlasbasename,varargin)
 
+subbasename = remove_extn_basename(subbasename);
+atlasbasename = remove_extn_basename(atlasbasename);
+
+
 [pth,subname,extt]=fileparts(subbasename);
+if isempty(pth)
+    pth=pwd();
+    subbasename=fullfile(pth,subname,extt);
+end
+
 subname=strcat(subname,extt);
 varargin{length(varargin)+1}='-r';
 
@@ -165,69 +174,59 @@ if ~contains(flags,'-U')
     pc.JobStorageLocation = par_dir;
     ps = parallel.Settings;
     ps.Pool.AutoCreate = true;
-    delete(gcp('nocreate')); 
+    delete(gcp('nocreate'));
     parpool(3);
     
 else
     ps = parallel.Settings;
     ps.Pool.AutoCreate = false;
 end
-%svreg_prepare_files(subbasename, atlasbasename,flags);
+% disp1('Computing cortical thickness using thicknessPVC method','svreg',flags);
+% a=tic;
+% thicknessPVC(subbasename);
+% toc(a)
+% disp1('thickess computed','svreg',flags);
 hemi={'left','right'};
 
-%% These two commands can run in parallel
 if ~contains(flags,'-s') || ~exist([subbasename_tmp,'.target.right.pial.cortex.reg.dfs'],'file')
     parfor jj=1:2
         svreg_label_surf_hemi(subbasename,atlasbasename,hemi{jj},surreg_varargin{:});
     end
-    %svreg_label_surf_hemi(subbasename,atlasbasename,'left',flags);
     
-    %if ~isempty(strfind(flags,'r'))
+        
     parfor jj=1:2
         refine_ROIs2(subbasename,hemi{jj},flags);
     end
-    %end
+    
+%     disp1('Mapping cortical thickness to atlas','svreg',flags);
+%     svreg_thickness2atlas(subbasename);
+%     disp1('Thickness mapped to atlas','svreg',flags);
+    
 end
 if ~contains(flags,'-S')
     
-    %map2atlas_thickness(subbasename);
     
     %%NOTE that atlasbasename chanes from this point on in the script
     atlasbasename=[subbasename,'.target'];
     
     %% These two commanda can run in parallel
     ss{1}=atlasbasename;ss{2}=subbasename;
-    if ~exist([subbasename_tmp,'_unitball_map.mat'],'file') || isempty(strfind(flags,'-p'))
+    if ~exist([subbasename_tmp,'_unitball_map.mat'],'file') || ~contains(flags,'-p')
         parfor sub=1:2
             volmap_ball(ss{sub},1,flags);
         end
     end
-    %volmap_ball(ss{2},1,flags);
     
     svreg_volreg(subbasename, atlasbasename,volreg_varargin{:});
     
-    %This can be made optional with a flag
+    svreg_refinements(subbasename, atlasbasename,'',flags);
     
-    if 1%~isempty(strfind(flags,'r'))
-        %%These two can be run in parallel
-        
-        svreg_refinements(subbasename, atlasbasename,'',flags);
-        
-        %%These two can be run in parallel
-        parfor jj=1:2
-            refine_sulci_hemi(subbasename,hemi{jj},flags);
-        end
-    else
-        copyfile([subbasename_tmp,'.left.mid.cortex.reg.dfs'],   [subbasename,'.left.mid.cortex.svreg.dfs'],'f');
-        copyfile([subbasename_tmp,'.right.mid.cortex.reg.dfs'],  [subbasename,'.right.mid.cortex.svreg.dfs'],'f');
-        copyfile([subbasename_tmp,'.left.inner.cortex.reg.dfs'], [subbasename,'.left.inner.cortex.svreg.dfs'],'f');
-        copyfile([subbasename_tmp,'.right.inner.cortex.reg.dfs'],[subbasename,'.right.inner.cortex.svreg.dfs'],'f');
-        copyfile([subbasename_tmp,'.left.pial.cortex.reg.dfs'],  [subbasename,'.left.pial.cortex.svreg.dfs'],'f');
-        copyfile([subbasename_tmp,'.right.pial.cortex.reg.dfs'], [subbasename,'.right.pial.cortex.svreg.dfs'],'f');
+    parfor jj=1:2
+        refine_sulci_hemi(subbasename,hemi{jj},flags);
     end
 end
 
-generate_stats_xls(subbasename, flags);
+%generate_stats_xls(subbasename, flags);
 
 
 if ~contains(flags,'-k')

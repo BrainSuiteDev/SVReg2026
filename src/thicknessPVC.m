@@ -53,13 +53,38 @@ function thicknessPVC(varargin)
 %     [subbase, '.heat_sol_comp.mat']
 %
 
+eps1=1e-4;
 if nargin<1
    error('thicknessPVC must have atleast one input.')
 end
-[subbase, vox_res_comp, inner_erode_sz, gopts] = parseInputThicknessPVC(varargin);
 
-tolFactor = 1e-12;
-MaxPCGiter = 4500; % set more than 1200
+[subbase, MaxPCGiter, vox_res_comp, inner_erode_sz, gopts] = parseInputThicknessPVC(varargin);
+subbase = remove_extn_basename(subbase);
+
+[pth,subname,extt]=fileparts(subbase);
+if isempty(pth)
+    pth=pwd();
+    subbase=fullfile(pth,subname,extt);
+end
+
+subname=strcat(subname,extt);
+
+%% Output a log
+logfname=[subbase,'.thickness.log'];
+fp=fopen(logfname,'a+');
+t = datestr(datetime('now'));
+fprintf(fp,'%s:',t);
+fprintf(fp,'thicknessPVC ');
+for jjj=1:length(varargin)
+    fprintf(fp,'%s ',varargin{jjj});
+end
+fprintf(fp,'\n');
+
+fclose(fp);
+%%
+
+tolFactor = 1e-120;
+%MaxPCGiter = 4500;%600;%1200 %4500; % set equal or more than 1200
 pad_comp_vox = 10; % in unit of voxels
 face_area_thresh = (vox_res_comp^2)/3; % in mm^2
 inner_erode_sz = ceil(inner_erode_sz/vox_res_comp); % converted to voxels
@@ -79,14 +104,16 @@ GMfrac(pvc.img>2 & pvc.img<=3) = 3 - pvc.img(pvc.img>2 & pvc.img<=3);
 nii = pvc;
 nii.img = GMfrac;
 save_untouch_nii_gz(nii, [subbase '.GM_frac.nii.gz']);
-GMfrac = GMfrac + eps;
+GMfrac = max(GMfrac, eps1); % If GM frac is too small add a small number
 clear nii pvc
 
 % upsample surface faces & compute volume from surfaces
+disp('Upsampling Surfaces');
 pial = upsampleSurfaceFace(pial, face_area_thresh, 6);
 grid_min = floor(min([inner.vertices; pial.vertices], [], 1)./vox_res_comp - pad_comp_vox);
 grid_max = ceil(max([inner.vertices; pial.vertices], [], 1)./vox_res_comp + pad_comp_vox);
 grid_size = (grid_max - grid_min) + 1;
+disp('converting surface to volume');
 pial_vol = surf2vol(pial.vertices, grid_size, vox_res_comp, grid_min);
 clear pial inner
 
@@ -99,13 +126,15 @@ se1 = strel_sphere(1);
 [volin_x, volin_y, volin_z] = ndgrid((0:(volSz(1)-1))*volRes(1), ...
    (0:(volSz(2)-1))*volRes(2), (0:(volSz(3)-1))*volRes(3)); % in mm, input grid
 
-GM_frac_vol = interpn(volin_x, volin_y, volin_z, GMfrac, volComp_x, volComp_y, volComp_z, 'linear', eps);
+GM_frac_vol = interpn(volin_x, volin_y, volin_z, GMfrac, volComp_x, volComp_y, volComp_z, 'linear', eps1);
+GM_frac_vol = max(GM_frac_vol,eps1); % Add eps1 to make sure that GM frac is never too small
+
 clear GMfrac
 
 temp = imgaussian(double(msk_inner.img>0), 0.7);
 msk_inner_vol = interpn(volin_x, volin_y, volin_z, temp, volComp_x, volComp_y, volComp_z, 'linear', 0);
 % msk_inner_vol = imerode(msk_inner_vol>0.5, se2);
-msk_inner_vol = refineInnerMask(msk_inner_vol>0.5, GM_frac_vol, 1e-6, inner_erode_sz);
+msk_inner_vol = refineInnerMask(msk_inner_vol>0.5, GM_frac_vol, 10*eps1, inner_erode_sz);
 
 temp = imgaussian(double(msk_cereb.img>0), 0.7);
 msk_cereb_vol = interpn(volin_x, volin_y, volin_z, temp, volComp_x, volComp_y, volComp_z, 'linear', 0);
@@ -125,7 +154,9 @@ clear pial_vol
 
 % create heat flow maps
 heatWt = 1./GM_frac_vol;
-heatWt(heatWt>1e6) = 1e6;
+%heatWt(heatWt>1e6) = 1e6;
+
+disp('Solving the heat eq... this may take some time.');
 
 if gopts.central
    D = createAnisoDwithMaskCentral(grid_size(1), grid_size(2), grid_size(3), msk_compute, sqrt(heatWt), [1 1 1]./vox_res_comp);
@@ -148,7 +179,8 @@ A = D*unmask_unknw;
 clear D mask_knw unmask_knw unmask_unknw
 
 % Least sq. sol with pcg
-Atb = A'*b; clear b; 
+Atb = A'*b;
+clear b; 
 AtA = A'*A; clear A;
 
 opts.type = 'nofill'; 
@@ -157,7 +189,9 @@ L = ichol(AtA, opts); % preconditioner
 
 tol = tolFactor/norm(Atb);
 [x,fl,rr,it,rv] = pcg(AtA, Atb, tol, MaxPCGiter, L, L', 1.5*ones(size(AtA,2),1));
-[fl, rr, it]
+
+fprintf('pcg did %d iterations\n', it);
+
 clear AtA Atb L
 
 [mask_knw, unmask_knw] = createMaskOperators(msk_compute & heat_vol>0);
@@ -166,6 +200,7 @@ heat_map = unmask_knw*mask_knw*heat_vol(:) + unmask_unknw*x;
 heat_map = reshape(heat_map, grid_size);
 heat_map(~msk_cereb_vol) = 2;
 heat_map(msk_inner_vol) = 1;
+
 clear mask_knw unmask_knw unmask_unknw x heat_vol
 
 
@@ -178,7 +213,7 @@ clear mask_knw unmask_knw unmask_unknw x heat_vol
 
 nii = load_untouch_nii_gz([subbase '.cortex.dewisp.mask.nii.gz']);
 nii.img = interpn(volComp_x, volComp_y, volComp_z, heat_map, volin_x, volin_y, volin_z, 'linear', 2);
-save_untouch_nii_gz(nii, [subbase '.heat_map_sol.nii.gz'], 64);
+save_untouch_nii_gz(nii, [subbase sprintf('.heat_map_sol.nii.gz')], 64);
 
 % Compute thickness (using iso-surface)
 [gy,gx,gz] = gradient(heat_map, vox_res_comp, vox_res_comp, vox_res_comp);
@@ -191,7 +226,8 @@ pvc_iso_thickness = interpn(volComp_x, volComp_y, volComp_z, thickness_vol, ...
    fv.vertices(:,1), fv.vertices(:,2), fv.vertices(:,3), 'linear');
 fv.attributes = pvc_iso_thickness;
 fv = colorDFS(fv, fv.attributes, [0 6], jet(256));
-writedfs([subbase, '.pvc-thickness_0-6mm.isosurface.dfs'], fv);
+writedfs([subbase, sprintf('.pvc-thickness_0-6mm.isosurface.dfs')], fv);
+
 
 inner = readdfsGz([subbase, '.inner.cortex.dfs']);
 pial = readdfsGz([subbase, '.pial.cortex.dfs']);
@@ -205,14 +241,14 @@ if isequal(size(inner.vertices), size(pial.vertices))
    mid.vertices = (inner.vertices + pial.vertices)/2;
    mid.attributes = F(mid.vertices(:,1), mid.vertices(:,2), mid.vertices(:,3));
    mid = colorDFS(mid, mid.attributes, [0 6], jet(256));
-   writedfs([subbase, '.pvc-thickness_0-6mm.mid.cortex.dfs'], mid);
+   writedfs([subbase, sprintf('.pvc-thickness_0-6mm.mid.cortex.dfs')], mid);
 end
 
-if exist([subbase, '.left.inner.cortex.svreg.dfs'],'file')
+%if exist([subbase, '.left.inner.cortex.svreg.dfs'],'file')
     split_thickness_map(subbase);
-end
+%end
 
-save([subbase, '.heat_sol_comp.mat'], 'volComp_x', 'volComp_y', 'volComp_z', 'heat_map', ...
+save([subbase, sprintf('.heat_sol_comp.mat')], 'volComp_x', 'volComp_y', 'volComp_z', 'heat_map', ...
    'thickness_vol', 'vox_res_comp', 'gopts', '-v7.3');
 clearvars -except subbase
 
@@ -239,24 +275,33 @@ msk_out = temp;
 
 end
 
-function [subbase, vox_res_comp, inner_erode_sz, gopts] = parseInputThicknessPVC(var)
+function [subbase, MaxPCGiter, vox_res_comp, inner_erode_sz, gopts] = parseInputThicknessPVC(var)
 % Parse input, so that it can handle compiled as well as function style inputs
 
 subbase = var{1};
 
 if length(var)>1
    if ischar(var{2})
-      vox_res_comp = str2double(var{2});
+      MaxPCGiter = str2double(var{2});
    else
-      vox_res_comp = var{2};
+      MaxPCGiter = var{2};
    end   
 end
 
+
 if length(var)>2
    if ischar(var{3})
-      inner_erode_sz = str2double(var{3});
+      vox_res_comp = str2double(var{3});
    else
-      inner_erode_sz = var{3};
+      vox_res_comp = var{3};
+   end   
+end
+
+if length(var)>3
+   if ischar(var{4})
+      inner_erode_sz = str2double(var{4});
+   else
+      inner_erode_sz = var{4};
    end   
 end
 
@@ -264,9 +309,9 @@ end
 % flag for OLD forward difference: -f (Uses Anand's modified code with, shifted response function)
 % flag for central difference: -c (defaults to 1.7 weight for central difference & 1.0 weight to forward difference)
 % flag for central difference: -c20 (uses a weight of 20 for central difference  & 1.0 weight to forward difference)
-if length(var)>3
-   if ischar(var{4})
-      temp = strtrim(var{4});
+if length(var)>4
+   if ischar(var{5})
+      temp = strtrim(var{5});
       
       switch temp(1:2)
          case '-f'
@@ -292,9 +337,13 @@ if length(var)>3
    end
 end
 
+if ~exist('MaxPCGiter', 'var')
+   MaxPCGiter = 6000; %Iterations of PCG
+end
+
 
 if ~exist('vox_res_comp', 'var')
-   vox_res_comp = 0.48; % in mm
+   vox_res_comp = 0.48;%0.7;%0.48; % in mm
 end
 
 if ~exist('inner_erode_sz', 'var')

@@ -88,7 +88,7 @@ export LD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
 
-# Perform resampling of 3D or 4D nifti files
-${exe_dir}/svreg_resample "$@" 
+[[ "$SVREG_EXEC" != "exec" ]] &&  SVREG_EXEC=;
+$SVREG_EXEC "${exe_dir}"/svreg_resample "$@" 
 
 exit

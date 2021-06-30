@@ -90,7 +90,7 @@ else
         unix(sprintf('"%s" "%s" "%s" "%s"',exename,warp_file_mov,[x_fname,'.img'],[xw_fname,'.img']));
         unix(sprintf('"%s" "%s" "%s" "%s"',exename,warp_file_mov,[y_fname,'.img'],[yw_fname,'.img']));
         unix(sprintf('"%s" "%s" "%s" "%s"',exename,warp_file_mov,[z_fname,'.img'],[zw_fname,'.img']));
-    else isunix
+    elseif isunix
         exename=fullfile(pth1,'3rdParty/AIR_bin/warp_coord_vol_linux');
         fprintf('Using Executable %s\n',exename);
         unix(sprintf('"%s" "%s" "%s" "%s"',exename,warp_file_mov,[x_fname,'.img'],[xw_fname,'.img']));
@@ -120,7 +120,7 @@ save([outfile,'_AIR.mat'],'map');
 delete([x_fname,'.hdr']);delete([x_fname,'.img']);delete([x_fname,'.mat'])
 delete([y_fname,'.hdr']);delete([y_fname,'.img']);delete([y_fname,'.mat'])
 delete([z_fname,'.hdr']);delete([z_fname,'.img']);delete([z_fname,'.mat'])
-delete([xw_fname,'.hdr']);delete([xw_fname,'.img']);delete([xw_fname,'.mat'])
-delete([yw_fname,'.hdr']);delete([yw_fname,'.img']);delete([yw_fname,'.mat'])
-delete([zw_fname,'.hdr']);delete([zw_fname,'.img']);delete([zw_fname,'.mat'])
+delete([xw_fname,'.hdr']);delete([xw_fname,'.img']);%delete([xw_fname,'.mat'])
+delete([yw_fname,'.hdr']);delete([yw_fname,'.img']);%delete([yw_fname,'.mat'])
+delete([zw_fname,'.hdr']);delete([zw_fname,'.img']);%delete([zw_fname,'.mat'])
 

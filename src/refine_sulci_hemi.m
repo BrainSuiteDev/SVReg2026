@@ -28,22 +28,37 @@ function refine_sulci_hemi(subbasename,hemi,varargin)
 % warranty. Use it at your own risk. Please email ajoshi@sipi.usc.edu if
 % you have any questions.
 
+subbasename = remove_extn_basename(subbasename);
+
 [pth,subname,extt]=fileparts(subbasename);
+
+if isempty(pth)
+    pth=pwd();
+    subbasename=fullfile(pth,subname,extt);
+end
+
 subname=strcat(subname,extt);
 tmpdir=fullfile(pth,[subname,'.svreg.tmp']);
 subbasename_tmp=fullfile(tmpdir,subname);
 
-if exist(tmpdir,'dir')    
-    logfname=[subbasename_tmp,'.svreg.log'];
-    fp=fopen(logfname,'a+');
-    fprintf(fp,'refine_sulci_hemi %s %s ',subbasename,hemi);
-    for jjj=1:length(varargin)
-        fprintf(fp,'%s ',varargin{jjj});
-    end
-    fprintf(fp,'\n');
-    
-    fclose(fp);
+
+%% Output a log
+logfname=[subbasename,'.svreg.log'];
+fp=fopen(logfname,'a+');
+t = datestr(datetime('now'));
+fprintf(fp,'%s:',t);
+[svreg_version,svreg_build] = get_svreg_version(subbasename);
+fprintf(fp,'SVReg %s(%s):',svreg_version,svreg_build);
+
+fprintf(fp,'refine_sulci_hemi %s %s ',subbasename, hemi);
+for jjj=1:length(varargin)
+    fprintf(fp,'%s ',varargin{jjj});
 end
+fprintf(fp,'\n');
+
+fclose(fp);
+%%
+
 flags='';
 for jj=1:size(varargin,2)
     flags=[flags,varargin{jj}];
@@ -191,7 +206,7 @@ for sul=1:length(curves1)
         end
     end
     [~,phi0tri]=get_zero_level_set(surf1c,phi);
-    if isempty(phi0tri)
+    if size(phi0tri,1) < 5 % zero level set has too few triangles (less thn 5)
         curvesout{sul}=curves1{sul};
         continue;
     end

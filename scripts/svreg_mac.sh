@@ -38,7 +38,7 @@ read -d '' usage <<EOF
   Authored by Anand A. Joshi, Signal and Image Processing Institute
   Department of Electrical Engineering, Viterbi School of Engineering, USC
 
-  usage: svregh.sh [subject fileprefix] [atlas fileprefix] [flags]
+  usage: svreg.sh [subject fileprefix] [atlas fileprefix] [flags]
 
   required input:
   subject fileprefix      path and filename prefix of the subject's output
@@ -56,7 +56,7 @@ read -d '' usage <<EOF
   -S      surface registration only
   -k      keep the intermediate files after the svreg sequence is complete
   -t      display timestamps along with output messages
-  -U      single thereaded mode
+  -U      single-threaded mode
 For the full list, please check http://brainsuite.org/processing/svreg/usage/
 
 EOF
@@ -78,7 +78,7 @@ while [ $# -gt 0 ]; do
   IS_FLAG=`echo "$token" | grep -q '^-' && echo "T"`;
   
   if [ "$IS_FLAG" = "T" ]; then 
-    FLAGS="${FLAGS} ${token}";
+    FLAGS="$FLAGS${FLAGS:+ }$token"
   elif [ -z $ATLASPREFIX ]; then 
     ATLASPREFIX="$token";
   fi
@@ -98,8 +98,8 @@ XAPPLRESDIR=${BrainSuiteMCR}/X11/app-defaults ;
 export PATH;
 export DYLD_LIBRARY_PATH;
 export XAPPLRESDIR;
-#FLAGS="${FLAGS}r"
-# Run the SVREG Sequence
-${exe_dir}/svreg.app/Contents/MacOS/svreg "${FILEPREFIX}" "${ATLASPREFIX}" "${FLAGS}"
+
+[[ "$SVREG_EXEC" != "exec" ]] &&  SVREG_EXEC=;
+$SVREG_EXEC "${exe_dir}"/svreg.app/Contents/MacOS/svreg "${FILEPREFIX}" "${ATLASPREFIX}" "${FLAGS}"
 
 exit

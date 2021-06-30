@@ -23,16 +23,11 @@ inner=readdfsGz([subbase, '.inner.cortex.dfs']);
 pial=readdfsGz([subbase, '.pial.cortex.dfs']);
 th=readdfs([subbase, '.pvc-thickness_0-6mm.mid.cortex.dfs']);
 
+inner_l=readdfsGz([subbase, '.left.inner.cortex.dfs']);
+pial_l=readdfsGz([subbase, '.left.pial.cortex.dfs']);
 
-inner_l=readdfsGz([subbase, '.left.inner.cortex.svreg.dfs']);
-pial_l=readdfsGz([subbase, '.left.pial.cortex.svreg.dfs']);
-
-tar_l=readdfsGz(fullfile(fileparts(subbase), 'atlas.left.mid.cortex.svreg.dfs'));
-
-
-inner_r=readdfsGz([subbase, '.right.inner.cortex.svreg.dfs']);
-pial_r=readdfsGz([subbase, '.right.pial.cortex.svreg.dfs']);
-tar_r=readdfsGz(fullfile(fileparts(subbase), 'atlas.right.mid.cortex.svreg.dfs'));
+inner_r=readdfsGz([subbase, '.right.inner.cortex.dfs']);
+pial_r=readdfsGz([subbase, '.right.pial.cortex.dfs']);
 
 [~,ia,ib]=intersect(inner.vertices,inner_l.vertices,'rows','stable');
 
@@ -52,14 +47,5 @@ mid_r.vcolor=th.vcolor(ia,:);
 mid_r.attributes=th.attributes(ia,:);
 mid_r=smooth_cortex_fast(mid_r,.5,2000);
 writedfs([subbase, '.pvc-thickness_0-6mm.right.mid.cortex.dfs'],mid_r);
-
-tar_l.attributes=map_data_flatmap(inner_l,mid_l.attributes,tar_l);
-tar_r.attributes=map_data_flatmap(inner_r,mid_r.attributes,tar_r);
-tar_l = colorDFS(tar_l, tar_l.attributes, [0 6], jet(256));
-tar_r = colorDFS(tar_r, tar_r.attributes, [0 6], jet(256));
-tar_l=smooth_cortex_fast(tar_l,.5,2000);
-tar_r=smooth_cortex_fast(tar_r,.5,2000);
-writedfs(fullfile(fileparts(subbase), 'atlas.pvc-thickness_0-6mm.left.mid.cortex.dfs'),tar_l);
-writedfs(fullfile(fileparts(subbase), 'atlas.pvc-thickness_0-6mm.right.mid.cortex.dfs'),tar_r);
 
 

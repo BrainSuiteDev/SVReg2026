@@ -44,7 +44,7 @@ function svreg_resample(varargin)
 p = inputParser;
 defaultDx = '1';   defaultDy = '1';   defaultDz = '1';
 defaultDim = '-res';
-defaultMethod='1inear';
+defaultMethod='linear';
 defaultExtapVal='';
 addRequired(p,'infile',@isstr);
 addRequired(p,'outfile',@isstr);

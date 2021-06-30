@@ -42,7 +42,12 @@ indknr=(smidr.labels~=0);
 vl_new=vl;
 % get ids of hippocampus amygdala etc
 pth=fileparts(subbasename);
-ids=get_hippo_label(fullfile(pth,'brainsuite_labeldescription.xml'));
+
+if existfile(fullfile(pth,'brainsuite_labeldescription.xml'))
+    ids=get_hippo_label(fullfile(pth,'brainsuite_labeldescription.xml'));
+else
+    ids = -999;
+end
 
 ind=find((vl_new.img>=100)&(vl_new.img<600)&(~ismember(vl_new.img,ids)));
 %ind=union(ind,ind_cortex_marked_as_wm);
@@ -68,9 +73,9 @@ aa=[XXs,YYs,ZZs]; clear XXs YYs ZZs;
 [ss,ind1]=unique(aa,'rows');
 val1=[smid.labels;smid.labels;smid.labels;smidr.labels;smidr.labels;smidr.labels;smidr.labels;smid.labels];
 %warning off;
-T= TriScatteredInterp(ss(:,1),ss(:,2),ss(:,3),val1(ind1));
+T= scatteredInterpolant(ss(:,1),ss(:,2),ss(:,3),val1(ind1));
 %warning on;
-T.Method='nearest';
+T.Method='nearest';T.ExtrapolationMethod='nearest';
 vl_new.img(ind)=T(XX(:),YY(:),ZZ(:));
 save_untouch_nii_gz(vl_new,[subbasename,'.svreg.',postfix,'ref.label.nii']);
 %gzip([subbasename,'.svreg.ref.label.nii']);

@@ -80,7 +80,7 @@ export LD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
 
-# Change the atlas
-${exe_dir}/svreg_labelwith_atlas "$@" 
+[[ "$SVREG_EXEC" != "exec" ]] &&  SVREG_EXEC=;
+$SVREG_EXEC "${exe_dir}"/svreg_labelwith_atlas "$@" 
 
 exit

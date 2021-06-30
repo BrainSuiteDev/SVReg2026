@@ -70,6 +70,6 @@ XAPPLRESDIR=${BrainSuiteMCR}/X11/app-defaults ;
 export LD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
-# Run sulci refinement
-${exe_dir}/register_cc_curve "${FILEPREFIX}"
+[[ "$SVREG_EXEC" != "exec" ]] &&  SVREG_EXEC=;
+$SVREG_EXEC "${exe_dir}"/register_cc_curve "${FILEPREFIX}"
 exit

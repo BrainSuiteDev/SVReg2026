@@ -18,29 +18,47 @@
 
 
 function refine_ROIs2(subs,hemi,varargin)
+
+subs = remove_extn_basename(subs);
+
 subbasename=subs;
 [pth,subname,extt]=fileparts(subs);
+if isempty(pth)
+    pth=pwd();
+    subbasename=fullfile(pth,subname,extt);
+    subs = subbasename;
+end
+
 subname=strcat(subname,extt);
 
 tmpdir=fullfile(pth,[subname,'.svreg.tmp']);
 %mkdir(tmpdir);
 subbasename_tmp=fullfile(tmpdir,subname);
 
-logfname=[subbasename_tmp,'.svreg.log'];
+
+%% Output a log
+logfname=[subbasename,'.svreg.log'];
 fp=fopen(logfname,'a+');
-fprintf(fp,'refine_ROIs2 %s %s ',subs,hemi);
+t = datestr(datetime('now'));
+fprintf(fp,'%s:',t);
+[svreg_version,svreg_build] = get_svreg_version(subbasename);
+fprintf(fp,'SVReg %s(%s):',svreg_version,svreg_build);
+
+fprintf(fp,'refine_ROIs2 %s %s ',subs, hemi);
 for jjj=1:length(varargin)
     fprintf(fp,'%s ',varargin{jjj});
 end
 fprintf(fp,'\n');
 
 fclose(fp);
-flags=[];
+%%
+
+flags='';
 for jj=1:size(varargin,2)
     flags=[flags,varargin{jj}];
 end
 
-if ~contains(flags,'-')
+if ~contains(flags,'-') || contains(flags,'BCI-DNI')
     postfix=flags;
     ext=['svreg.',postfix];
 else
@@ -196,7 +214,13 @@ end
 writedfs(subs_out,surf1);
 
 corr_topology_labels(subs_out);
-recolor_by_label(subs_out,subs_out);
+
+xmlf = fullfile(pth,['brainsuite_labeldescription.',postfix,'.xml']);
+if ~exist(xmlf,'file')
+    xmlf = fullfile(pth,'brainsuite_labeldescription.xml');
+end
+
+recolor_by_label(subs_out,subs_out,xmlf);
 copy_attrib_colors(subbasename_tmp,hemi,[ext,'dfs']);
 %copy_attrib_colors(subbasename,'right');
 %subbasename=subs;

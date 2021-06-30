@@ -76,7 +76,7 @@ export LD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
 
-# Perform volume smoothing
-${exe_dir}/svreg_smooth_vol_function "${INFILE}" "${STDX}" "${STDY}" "${STDZ}" "${OUTFILE}" 
+[[ "$SVREG_EXEC" != "exec" ]] &&  SVREG_EXEC=;
+$SVREG_EXEC "${exe_dir}"/svreg_smooth_vol_function "${INFILE}" "${STDX}" "${STDY}" "${STDZ}" "${OUTFILE}" 
 
 exit

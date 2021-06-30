@@ -69,7 +69,7 @@ while [ $# -gt 0 ]; do
   IS_FLAG=`echo "$token" | grep -q '^-' && echo "T"`;
   
   if [ "$IS_FLAG" = "T" ]; then 
-    FLAGS="${FLAGS} ${token}";
+    FLAGS="$FLAGS${FLAGS:+ }$token"
   fi
   shift
 done
@@ -82,6 +82,6 @@ XAPPLRESDIR=${BrainSuiteMCR}/X11/app-defaults ;
 export DYLD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
-# Generate stats CSV file
-${exe_dir}/generate_stats_xls.app/Contents/MacOS/generate_stats_xls "${FILEPREFIX}" "${FLAGS}"
+[[ "$SVREG_EXEC" != "exec" ]] &&  SVREG_EXEC=;
+$SVREG_EXEC "${exe_dir}"/generate_stats_xls.app/Contents/MacOS/generate_stats_xls "${FILEPREFIX}" "${FLAGS}"
 exit

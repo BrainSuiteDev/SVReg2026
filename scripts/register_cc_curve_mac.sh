@@ -66,6 +66,6 @@ export DYLD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
 
-# Refine volume labels
-${exe_dir}/register_cc_curve.app/Contents/MacOS/register_cc_curve "${FILEPREFIX}"
+[[ "$SVREG_EXEC" != "exec" ]] &&  SVREG_EXEC=;
+$SVREG_EXEC "${exe_dir}"/register_cc_curve.app/Contents/MacOS/register_cc_curve "${FILEPREFIX}"
 exit

@@ -18,6 +18,15 @@
 
 function svreg_labelwith_atlas(subbasename,atlasbasename,postfix)
 
+subbasename = remove_extn_basename(subbasename);
+atlasbasename = remove_extn_basename(atlasbasename);
+
+[pth,subname,extt]=fileparts(subbasename);
+if isempty(pth)
+    pth=pwd();
+    subbasename=fullfile(pth,subname,extt);
+end
+
 if (nargin < 3)
     fprintf('USAGE: svreg_labelwith_atlas.sh subbasename, atlasbasename, postfix\n');
     fprintf('subbasename: subjectbasename as in svreg command line\n');

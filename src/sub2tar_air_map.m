@@ -22,13 +22,13 @@ warp_file_mov=[subbasename,'.warp'];
 sub_file_base=[subbasename,'.bfc.nii.gz'];
 outfile1=get_rand_fname();
 
-get_air_map(interm_file_base,warp_file_mov,sub_file_base,outfile1)
+get_air_map(interm_file_base,warp_file_mov,sub_file_base,outfile1);
 
 warp_tar_file_mov=[subbasename_tmp,'_atlas.warp'];
 tar_file_base=[atlasbasename,'.bfc.nii.gz'];
 outfile2=get_rand_fname();
 
-get_air_map(interm_file_base,warp_tar_file_mov,tar_file_base,outfile2)
+get_air_map(interm_file_base,warp_tar_file_mov,tar_file_base,outfile2);
 tar_file_base=[atlasbasename];
 sub_file_base=[subbasename];
 sub_file_base_tmp=subbasename_tmp;

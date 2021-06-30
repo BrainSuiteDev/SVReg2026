@@ -123,7 +123,7 @@ v.img(ismember(v.img,cortical_rois) & cerebrum_mask.img==0)=0;
 ind12=find((v.img~=0)&~ismember(v.img,non_cortical_rois)&cerebrum_mask.img>0 & v.img~=2000);
 [XX,YY,ZZ]=ind2sub(size(vlo.img),ind12);%XX=XX-1;YYu=YYu-1;ZZu=ZZu-1;
 
-F = TriScatteredInterp(XX,YY,ZZ,double(v.img(ind12)),'nearest'); clear XX YY ZZ
+F = scatteredInterpolant(XX,YY,ZZ,double(v.img(ind12)),'nearest'); clear XX YY ZZ
 %F.Method='nearest';
 indd=find(cerebrum_mask.img>0 & (v.img==0));
 
@@ -139,15 +139,16 @@ v.img(indd)=F(XXu+.753,YYu+.352,ZZu+.551); clear XXu YYu ZZu F
 ind12=find((v.img~=0)&~ismember(v.img,cortical_rois)&cerebrum_mask.img==0);
 [XX,YY,ZZ]=ind2sub(size(vlo.img),ind12);%XX=XX-1;YYu=YYu-1;ZZu=ZZu-1;
 
-F = TriScatteredInterp(XX,YY,ZZ,double(v.img(ind12)),'nearest'); clear XX YY ZZ
+F = scatteredInterpolant(XX,YY,ZZ,double(v.img(ind12)),'nearest'); clear XX YY ZZ
 %F.Method='nearest';
 indd=find((cerebrum_mask.img==0&vpvc.img>0) & (v.img==0));
 
 [XXu,YYu,ZZu]=ind2sub(size(vlo.img),indd);%XXu=XXu-1;YYu=YYu-1;ZZu=ZZu-1;
 
-v.img(indd)=F(XXu+.753,YYu+.352,ZZu+.551); clear XXu YYu ZZu F
+if ~isempty(indd) && ~isempty(ind12)
+    v.img(indd)=F(XXu+.753,YYu+.352,ZZu+.551); clear XXu YYu ZZu F
+end
 %%%%%%%
-
 
 
 
@@ -167,7 +168,7 @@ vl.img(vl.img==3)=2000;
 vl.img(ind)=vl.img(ind)+1000;
 vl.img(ind(subind))=vl.img(ind(subind))+1000;
 
-if strfind(flags,'C')
+if contains(flags,'C')
     vl.img=double(vl.img).*double(vpvc.img>0);
 else
     vl.img(ismember(vl.img,cortical_rois)|vl.img>1000)=vl.img(ismember(vl.img,cortical_rois)|vl.img>1000).*double(msk(ismember(vl.img,cortical_rois)|vl.img>1000)>0);
@@ -182,6 +183,7 @@ vl.img((vl.img==740)& (vlwm.img==0))=0;
 save_untouch_nii_gz(vl,sprintf('%s.svreg.%sdws.label.nii',subbasename_tmp,postfix));
 %gzip(sprintf('%s.svreg.dws.label.nii',subbasename_tmp));
 %delete(sprintf('%s.svreg.dws.label.nii',subbasename_tmp));
+
 
 copyfile(sprintf('%s.svreg.%sdws.label.nii.gz',subbasename_tmp,postfix),sprintf('%s.svreg.%slabel.nii.gz',subbasename,postfix),'f');
 

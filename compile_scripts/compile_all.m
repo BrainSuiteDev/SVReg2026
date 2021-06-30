@@ -91,6 +91,9 @@ try
             mcc -m -v svreg_labelwith_atlas.m
             mcc -m -v svreg_sulcal_map.m
             mcc -m -v svreg_mni2sub.m
+            mcc -m -v svreg_thickness2atlas.m
+            %mcc -m svreg_multiparc.m
+
 
         elseif ismac || isunix
             cmd_str=['-I ',cmd_str];
@@ -119,6 +122,9 @@ try
             cmd_str21=[mrt,'/bin/mcc -m -v svreg_labelwith_atlas.m ' cmd_str];
             cmd_str22=[mrt,'/bin/mcc -m -v svreg_sulcal_map.m ' cmd_str];
             cmd_str23=[mrt,'/bin/mcc -m -v svreg_mni2sub.m ' cmd_str];
+            cmd_str24=[mrt,'/bin/mcc -m -v svreg_thickness2atlas.m ' cmd_str];
+%            cmd_str25=[mrt,'/bin/mcc -m -v svreg_multiparc.m ' cmd_str];
+
             
             system(cmd_str1);
             system(cmd_str3);system(cmd_str4);
@@ -131,7 +137,8 @@ try
             system(cmd_str17);system(cmd_str18);
             system(cmd_str19);system(cmd_str20);
             system(cmd_str21);system(cmd_str22);
-            system(cmd_str23);
+            system(cmd_str23);system(cmd_str24);
+ %           system(cmd_str25);
         end
         
         disp('Compilation done.');
@@ -180,7 +187,12 @@ version_files = {
     ['..' filesep 'src' filesep 'svreg_smooth_vol_function.m'],...
     ['..' filesep 'src' filesep 'svreg_labelwith_atlas.m'],...
     ['..' filesep 'src' filesep 'svreg_sulcal_map.m'],...
-    ['..' filesep 'src' filesep 'svreg_mni2sub.m']};
+    ['..' filesep 'src' filesep 'svreg_mni2sub.m'],...
+    ['..' filesep 'src' filesep 'svreg_thickness2atlas.m']%,...
+    %['..' filesep 'src' filesep 'svreg_multiparc.m']
+    };
+
+
 previous_version = fileread('svreg_version.txt');
 
 if strcmp(previous_version, svreg_version)
@@ -211,6 +223,8 @@ end
 function package_files_pc(svreg_version, atlases)
 [workdir bindir] = setup_package(svreg_version, atlases);
 
+copyfile('../scripts/svreg_runall.cmd', [bindir filesep 'svreg_runall.cmd']);
+copyfile('../scripts/svreg.cmd', [bindir filesep 'svreg.cmd']);
 copyfile('svreg.exe', [bindir filesep 'svreg.exe']);
 copyfile('svreg_label_surf_hemi.exe', [bindir filesep 'svreg_label_surf_hemi.exe']);
 copyfile('generate_stats_xls.exe', [bindir filesep 'generate_stats_xls.exe']);
@@ -233,6 +247,8 @@ copyfile('svreg_resample.exe', [bindir filesep 'svreg_resample.exe']);
 copyfile('svreg_labelwith_atlas.exe', [bindir filesep 'svreg_labelwith_atlas.exe']);
 copyfile('svreg_sulcal_map.exe', [bindir filesep 'svreg_sulcal_map.exe']);
 copyfile('svreg_mni2sub.exe', [bindir filesep 'svreg_mni2sub.exe']);
+copyfile('svreg_thickness2atlas.exe', [bindir filesep 'svreg_thickness2atlas.exe']);
+%copyfile('svreg_multiparc.exe', [bindir filesep 'svreg_multiparc.exe']);
 
 copyfile('../3rdParty/AIR_bin/warp_coord_vol.exe', [bindir filesep 'warp_coord_vol.exe']);
 copyfile('../3rdParty/AIR_bin/warp_points.exe', [bindir filesep 'warp_points.exe']);
@@ -266,12 +282,15 @@ copyfile('svreg_resample.app', [bindir filesep 'svreg_resample.app']);
 copyfile('svreg_labelwith_atlas.app', [bindir filesep 'svreg_labelwith_atlas.app']);
 copyfile('svreg_sulcal_map.app', [bindir filesep 'svreg_sulcal_map.app']);
 copyfile('svreg_mni2sub.app', [bindir filesep 'svreg_mni2sub.app']);
+copyfile('svreg_thickness2atlas.app', [bindir filesep 'svreg_thickness2atlas.app']);
+%copyfile('svreg_multiparc.app', [bindir filesep 'svreg_multiparc.app']);
 
 copyfile('../3rdParty/AIR_bin/warp_coord_vol_mac', [bindir filesep 'warp_coord_vol_mac']);
 copyfile('../3rdParty/AIR_bin/warp_points_mac', [bindir filesep 'warp_points_mac']);
 
 
 
+copyfile('../scripts/svreg_runall.sh', [bindir filesep 'svreg_runall.sh']);
 copyfile('../scripts/svreg_mac.sh', [bindir filesep 'svreg.sh']);
 copyfile('../scripts/svreg_label_surf_hemi_mac.sh', [bindir filesep 'svreg_label_surf_hemi.sh']);
 copyfile('../scripts/generate_stats_xls_mac.sh', [bindir filesep 'generate_stats_xls.sh']);
@@ -294,6 +313,8 @@ copyfile('../scripts/svreg_resample_mac.sh', [bindir filesep 'svreg_resample.sh'
 copyfile('../scripts/svreg_labelwith_atlas_mac.sh', [bindir filesep 'svreg_labelwith_atlas.sh']);
 copyfile('../scripts/svreg_sulcal_map_mac.sh', [bindir filesep 'svreg_sulcal_map.sh']);
 copyfile('../scripts/svreg_mni2sub_mac.sh', [bindir filesep 'svreg_mni2sub.sh']);
+copyfile('../scripts/svreg_thickness2atlas_mac.sh', [bindir filesep 'svreg_thickness2atlas.sh']);
+%copyfile('../scripts/svreg_multiparc_mac.sh', [bindir filesep 'svreg_multiparc.sh']);
 
 fileattrib([bindir filesep '*.sh'], '+x');
 
@@ -327,11 +348,13 @@ copyfile('svreg_resample', [bindir filesep 'svreg_resample']);
 copyfile('svreg_labelwith_atlas', [bindir filesep 'svreg_labelwith_atlas']);
 copyfile('svreg_sulcal_map', [bindir filesep 'svreg_sulcal_map']);
 copyfile('svreg_mni2sub', [bindir filesep 'svreg_mni2sub']);
+copyfile('svreg_thickness2atlas', [bindir filesep 'svreg_thickness2atlas']);
+%copyfile('svreg_multiparc', [bindir filesep 'svreg_multiparc']);
 
 copyfile('../3rdParty/AIR_bin/warp_coord_vol_linux', [bindir filesep 'warp_coord_vol_linux']);
 copyfile('../3rdParty/AIR_bin/warp_points_linux', [bindir filesep 'warp_points_linux']);
 
-
+copyfile('../scripts/svreg_runall.sh', [bindir filesep 'svreg_runall.sh']);
 copyfile('../scripts/svreg_linux.sh', [bindir filesep 'svreg.sh']);
 copyfile('../scripts/svreg_label_surf_hemi_linux.sh', [bindir filesep 'svreg_label_surf_hemi.sh']);
 copyfile('../scripts/generate_stats_xls_linux.sh', [bindir filesep 'generate_stats_xls.sh']);
@@ -354,6 +377,8 @@ copyfile('../scripts/svreg_resample_linux.sh', [bindir filesep 'svreg_resample.s
 copyfile('../scripts/svreg_labelwith_atlas_linux.sh', [bindir filesep 'svreg_labelwith_atlas.sh']);
 copyfile('../scripts/svreg_sulcal_map_linux.sh', [bindir filesep 'svreg_sulcal_map.sh']);
 copyfile('../scripts/svreg_mni2sub_linux.sh', [bindir filesep 'svreg_mni2sub.sh']);
+copyfile('../scripts/svreg_thickness2atlas_linux.sh', [bindir filesep 'svreg_thickness2atlas.sh']);
+%copyfile('../scripts/svreg_multiparc_linux.sh', [bindir filesep 'svreg_multiparc.sh']);
 
 fileattrib([bindir filesep '*.sh'], '+x');
 
@@ -527,7 +552,10 @@ executables = {['clean_intermediate_files' fileEnding], ...
     ['svreg_resample',fileEnding],...
     ['svreg_labelwith_atlas',fileEnding],...
     ['svreg_sulcal_map',fileEnding],...
-    ['svreg_mni2sub',fileEnding]};
+    ['svreg_mni2sub',fileEnding],...
+    ['svreg_thickness2atlas',fileEnding]%,...
+    %['svreg_multiparc',fileEnding]
+    };
 
 if ismac
     for i = 1:length(executables)

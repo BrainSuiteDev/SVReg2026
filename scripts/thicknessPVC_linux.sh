@@ -65,7 +65,7 @@ while [ $# -gt 0 ]; do
   IS_FLAG=`echo "$token" | grep -q '^-' && echo "T"`;
   
   if [ "$IS_FLAG" = "T" ]; then 
-    FLAGS="${FLAGS} ${token}";
+    FLAGS="$FLAGS${FLAGS:+ }$token"
   elif [ -z $ATLASPREFIX ]; then 
     ATLASPREFIX="$token";
   fi
@@ -92,8 +92,7 @@ export LD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
 
-# Compute cortical thickness
-#FLAGS="${FLAGS}r"
-${exe_dir}/thicknessPVC "${FILEPREFIX}" 
+[[ "$SVREG_EXEC" != "exec" ]] &&  SVREG_EXEC=;
+$SVREG_EXEC "${exe_dir}"/thicknessPVC "${FILEPREFIX}" 
 
 exit

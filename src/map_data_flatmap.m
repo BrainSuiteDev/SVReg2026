@@ -19,10 +19,10 @@
 
 function tar_data=map_data_flatmap(sub,subdata,tar,method,cleanflag)
 
-if ~exist('method','var');
+if ~exist('method','var')
     method='linear';
 end
-if ~exist('cleanflag','var');
+if ~exist('cleanflag','var')
     cleanflag=1;
 end
 if cleanflag

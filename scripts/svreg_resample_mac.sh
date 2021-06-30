@@ -84,7 +84,7 @@ export DYLD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
 
-# Perform resampling of 3D or 4D nifti files
-${exe_dir}/svreg_resample.app/Contents/MacOS/svreg_resample "$@" 
+[[ "$SVREG_EXEC" != "exec" ]] &&  SVREG_EXEC=;
+$SVREG_EXEC "${exe_dir}"/svreg_resample.app/Contents/MacOS/svreg_resample "$@" 
 
 exit

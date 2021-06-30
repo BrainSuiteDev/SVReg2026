@@ -19,6 +19,17 @@
 
 
 function register_cc_curve(sname)
+
+sname = remove_extn_basename(sname);
+
+[pth,subname,extt]=fileparts(sname);
+if isempty(pth)
+    pth=pwd();
+    sname=fullfile(pth,subname,extt);
+end
+
+subname=strcat(subname,extt);
+
 sname1=strrep(sname,'.right.mid.cortex_smooth10.dfs','');
 sname1=strrep(sname1,'.left.mid.cortex_smooth10.dfs','');
 

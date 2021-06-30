@@ -19,20 +19,34 @@
 
 
 function svreg_label_surf_hemi(subbasename,atlasbasename,hemi, varargin)
+
+subbasename = remove_extn_basename(subbasename);
+atlasbasename = remove_extn_basename(atlasbasename);
+
 if strcmp(hemi,'left')
     pause(5); % Pause for 5 sec to avoid race with left hemi thread.
 end
 
 [pth,subname,extt]=fileparts(subbasename);
+
+if isempty(pth)
+    pth=pwd();
+    subbasename=fullfile(pth,subname,extt);
+end
+
 subname=strcat(subname,extt);
 tmpdir=fullfile(pth,[subname,'.svreg.tmp']);
 warning off
 mkdir(tmpdir);
 warning on
 subbasename_tmp=fullfile(tmpdir,subname);
-
-logfname=[subbasename_tmp,'.svreg.log'];
+%%
+logfname=[subbasename,'.svreg.log'];
 fp=fopen(logfname,'a+');
+t = datestr(datetime('now'));
+fprintf(fp,'%s:',t);
+[svreg_version,svreg_build] = get_svreg_version(subbasename,atlasbasename);
+fprintf(fp,'SVReg %s(%s):',svreg_version,svreg_build);
 fprintf(fp,'svreg_label_surf_hemi %s %s %s ',subbasename,atlasbasename,hemi);
 for jjj=1:length(varargin)
     fprintf(fp,'%s ',varargin{jjj});
@@ -40,6 +54,7 @@ end
 fprintf(fp,'\n');
 
 fclose(fp);
+%%
 
 if strcmp(hemi,'right')
     svreg_path=fileparts(fileparts(atlasbasename));%getcurrentdir;%ctfroot;%mfilename('fullpath');
@@ -53,7 +68,25 @@ if strcmp(hemi,'right')
     atlas_labels_fname=[subbasename_tmp '.target.label.nii'];
     copyfile([atlasbasename, '.label.nii.gz'],[atlas_labels_fname,'.gz'],'f');
     
-    a=fileparts(atlasbasename);sa=fileparts(subbasename_tmp);
+    pth = fileparts(atlasbasename);
+    svreg_pth = fileparts(pth);
+    
+    pth_sub=fileparts(subbasename);
+    copyfile(fullfile(svreg_pth,'svregmanifest.xml'),pth_sub);
+
+    
+    roi_list_file = fullfile(pth,'roi_list_svreg.txt');
+    if exist(roi_list_file,'file')
+        copyfile(roi_list_file,pth_sub,'f');
+    else
+        get_list_rois(subbasename);
+    end
+    
+    [svreg_version,svreg_build] = get_svreg_version(subbasename,atlasbasename);
+    append_roilist(fullfile(pth_sub,'roi_list_svreg.txt'),svreg_version,svreg_build)
+    
+    
+    a = fileparts(atlasbasename);sa=fileparts(subbasename_tmp);
     copyfile(fullfile(a,'brainsuite_labeldescription.xml'),fullfile(sa,'brainsuite_labeldescription.xml'),'f');
     
     sa=fileparts(subbasename);

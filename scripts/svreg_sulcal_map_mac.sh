@@ -90,7 +90,7 @@ export DYLD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
 
-# Compute the sulcal map
-${exe_dir}/svreg_sulcal_map.app/Contents/MacOS/svreg_sulcal_map "${INFILE}" "${ATFILE}" "${XMLF}" "${XMLC}" "${dist_thr}"
+[[ "$SVREG_EXEC" != "exec" ]] &&  SVREG_EXEC=;
+$SVREG_EXEC "${exe_dir}"/svreg_sulcal_map.app/Contents/MacOS/svreg_sulcal_map "${INFILE}" "${ATFILE}" "${XMLF}" "${XMLC}" "${dist_thr}"
 
 exit

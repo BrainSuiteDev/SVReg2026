@@ -70,6 +70,7 @@ export LD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
 # 
-${exe_dir}/svreg_mni2sub "${FILEPREFIX}" "${ATLASPREFIX}" "${MX}" "${MY}" "${MZ}"
+[[ "$SVREG_EXEC" != "exec" ]] &&  SVREG_EXEC=;
+$SVREG_EXEC "${exe_dir}"/svreg_mni2sub "${FILEPREFIX}" "${ATLASPREFIX}" "${MX}" "${MY}" "${MZ}"
 
 exit

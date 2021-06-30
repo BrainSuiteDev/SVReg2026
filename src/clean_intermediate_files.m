@@ -19,6 +19,29 @@
 
 function clean_intermediate_files(subbasename,varargin)
 
+subbasename = remove_extn_basename(subbasename);
+
+[pth,subname,extt]=fileparts(subbasename);
+if isempty(pth)
+    pth=pwd();
+    subbasename=fullfile(pth,subname,extt);
+end
+
+%% Output a log
+logfname=[subbasename,'.svreg.log'];
+fp=fopen(logfname,'a+');
+t = datestr(datetime('now'));
+fprintf(fp,'%s:',t);
+[svreg_version,svreg_build] = get_svreg_version(subbasename);
+fprintf(fp,'SVReg %s(%s):',svreg_version,svreg_build);
+fprintf(fp,'clean_intermediate_files %s ',subbasename);
+for jjj=1:length(varargin)
+    fprintf(fp,'%s ',varargin{jjj});
+end
+fprintf(fp,'\n');
+
+fclose(fp);
+%%
 fclose('all');
 [pth,subname,extt]=fileparts(subbasename);
 subname=strcat(subname,extt);

@@ -19,15 +19,28 @@
 
 function svreg_volreg(subbasename, atlas_name,varargin)
 
+subbasename = remove_extn_basename(subbasename);
+
+
 [pth,subname,extt]=fileparts(subbasename);
+if isempty(pth)
+    pth=pwd();
+    subbasename=fullfile(pth,subname,extt);
+end
 subname=strcat(subname,extt);
 
 tmpdir=fullfile(pth,[subname,'.svreg.tmp']);
 %mkdir(tmpdir);
 subbasename_tmp=fullfile(tmpdir,subname);
 
-logfname=[subbasename_tmp,'.svreg.log'];
+
+%% Output a log
+logfname=[subbasename,'.svreg.log'];
 fp=fopen(logfname,'a+');
+t = datestr(datetime('now'));
+fprintf(fp,'%s:',t);
+[svreg_version,svreg_build] = get_svreg_version(subbasename);
+fprintf(fp,'SVReg %s(%s):',svreg_version,svreg_build);
 fprintf(fp,'svreg_volreg %s %s ',subbasename, atlas_name);
 for jjj=1:length(varargin)
     fprintf(fp,'%s ',varargin{jjj});
@@ -35,6 +48,7 @@ end
 fprintf(fp,'\n');
 
 fclose(fp);
+%%
 
 flags='';
 for jj=1:size(varargin,2)

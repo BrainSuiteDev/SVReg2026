@@ -17,6 +17,19 @@
 % USA.
 
 function svreg_make_atlas(subbasename,atlasbasename,flags)
+
+subbasename = remove_extn_basename(subbasename);
+atlasbasename = remove_extn_basename(atlasbasename);
+
+
+[pth,subname,extt]=fileparts(subbasename);
+if isempty(pth)
+    pth=pwd();
+    subbasename=fullfile(pth,subname,extt);
+end
+
+subname=strcat(subname,extt);
+
 % This function prepares the subject to be used as a new atlas
 if (nargin < 2)
     fprintf('USAGE: svreg_make_atlas.sh subbasename atlasbasename flags\n');
@@ -131,3 +144,7 @@ if strfind(flags,'-E')
     fprintf('-E flag found the volume is manually edited\n');
     surf_label_atlas(subbasename);
 end
+
+
+make_roilist_file(subbasename);
+

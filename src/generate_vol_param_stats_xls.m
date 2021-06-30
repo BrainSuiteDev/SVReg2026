@@ -17,11 +17,19 @@
 % USA.
 
 function generate_vol_param_stats_xls(subbasename,param_nii_filename,varargin)
+
+subbasename = remove_extn_basename(subbasename);
+
 % Generate statistics from a given volumetric parameter file
-
-
 [pth,subname,extt]=fileparts(subbasename);
+if isempty(pth)
+    pth=pwd();
+    subbasename=fullfile(pth,subname,extt);
+end
+
 subname=strcat(subname,extt);
+
+
 tmpdir=fullfile(pth,[subname,'.svreg.tmp']);
 % warning off
 % mkdir(tmpdir);

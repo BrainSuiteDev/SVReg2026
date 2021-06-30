@@ -19,8 +19,19 @@
 
 function svreg_refinements(subbasename,atlas_name,postfix,varargin)
 
-% check if postfix is a valid string, if not use it as flag
-if strfind(postfix,'-')
+subbasename = remove_extn_basename(subbasename);
+
+[pth,subname,extt]=fileparts(subbasename);
+if isempty(pth)
+    pth=pwd();
+    subbasename=fullfile(pth,subname,extt);
+end
+
+if ~exist('postfix','var')
+    postfix='';
+end
+% check if postfix's first letter is -, if yes use it as flag
+if ~isempty(postfix) && postfix(1) == '-'
     varargin{end+1}=postfix;
     postfix=[];
 end
@@ -33,15 +44,25 @@ tmpdir=fullfile(pth,[subname,'.svreg.tmp']);
 %mkdir(tmpdir);
 subbasename_tmp=fullfile(tmpdir,subname);
 
-logfname=[subbasename_tmp,'.svreg.log'];
+
+%% Output a log
+logfname=[subbasename,'.svreg.log'];
 fp=fopen(logfname,'a+');
-fprintf(fp,'svreg_refinements %s %s ',subbasename,atlas_name);
+t = datestr(datetime('now'));
+fprintf(fp,'%s:',t);
+[svreg_version,svreg_build] = get_svreg_version(subbasename);
+fprintf(fp,'SVReg %s(%s):',svreg_version,svreg_build);
+fprintf(fp,'svreg_refinements %s %s %s ',subbasename, atlas_name, postfix);
 for jjj=1:length(varargin)
     fprintf(fp,'%s ',varargin{jjj});
 end
 fprintf(fp,'\n');
 
 fclose(fp);
+%%
+
+
+
 flags='';
 for jj=1:size(varargin,2)
     flags=[flags,varargin{jj}];
@@ -68,5 +89,9 @@ if ~exist('flags','var')
 end
 %disp1('Refining Volumetric ROIs','svreg_refinements');
 refine_vol_labels(subbasename_tmp,postfix);
-correct_vol_labels(subbasename,postfix,flags);
+if isempty(postfix)|| contains(postfix,'USCBrain') || contains(postfix,'BCI-DNI') || contains(postfix,'USCLobes')
+    correct_vol_labels(subbasename,postfix,flags);
+else
+    copyfile(sprintf('%s.svreg.%sref.label.nii.gz',subbasename_tmp,postfix),sprintf('%s.svreg.%slabel.nii.gz',subbasename,postfix),'f');
+end
 

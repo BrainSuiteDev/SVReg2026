@@ -72,7 +72,7 @@ while [ $# -gt 0 ]; do
   IS_FLAG=`echo "$token" | grep -q '^-' && echo "T"`;
   
   if [ "$IS_FLAG" = "T" ]; then 
-    FLAGS="${FLAGS} ${token}";
+    FLAGS="$FLAGS${FLAGS:+ }$token"
   fi
   shift
 done
@@ -86,6 +86,6 @@ export DYLD_LIBRARY_PATH;
 export XAPPLRESDIR;
 
 
-# Perform volume registration
-${exe_dir}/svreg_make_atlas.app/Contents/MacOS/svreg_make_atlas "${INFILE}" "${ATFILE}" "${FLG}"
+[[ "$SVREG_EXEC" != "exec" ]] &&  SVREG_EXEC=;
+$SVREG_EXEC "${exe_dir}"/svreg_make_atlas.app/Contents/MacOS/svreg_make_atlas "${INFILE}" "${ATFILE}" "${FLG}"
 exit
