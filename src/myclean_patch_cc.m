@@ -47,16 +47,9 @@ if isempty(p.faces)
 end
 p.faces=myclean_tri(p.faces);
 
-%conn=triangles_connectivity(p.faces);
 [TriConn] = faces_connectivity_fast(p,0);
 [A] = faces2faces_connectivity(p,TriConn);
-%rowno=[];colno=[];datano=[];
-%for jj=1:length(conn)
-%    rowno = [rowno;repmat(jj,length(conn{jj}),1)];
-%    colno = [colno;conn{jj}'];
-%    datano= [datano;ones(length(conn{jj}),1)];
-%end
-%A=sparse(rowno,colno,datano);
+
 A=A+speye(size(A));
 
 [s,c]=scomponents(A);
@@ -76,10 +69,6 @@ for jj=1:s
 end
 
 
-%    if (length(conn{jj})<2)
-%        bad_tri=union(bad_tri,jj);
-%    end
-%end
 p.faces(c~=lcc,:)=[];
 
 p.faces=myclean_tri(p.faces);

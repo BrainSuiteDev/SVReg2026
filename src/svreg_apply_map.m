@@ -71,7 +71,14 @@ if ~contains(data_file,'.eig.')
     if length(size(vsubjFA.img))==3
         vAtlasFA.img=interp3(single(vsubjFA.img),vMap.img(:,:,:,2),vMap.img(:,:,:,1),vMap.img(:,:,:,3),interp_type);
     end
-    
+
+    %% copy header
+    if ~isempty(target_file) && existfile(target_file)
+        vv = load_nii_BIG_Lab(target_file);
+        vAtlasFA.hdr = vv.hdr;
+    end
+
+
     % apply it to 4D data
     if length(size(vsubjFA.img))==4
         vAtlasFA.hdr.dime.dim(1) = 4;
@@ -100,11 +107,6 @@ if ~contains(data_file,'.eig.')
         if ~isempty(smoothness)
             vAtlasFA.img=double(vAtlasFA.img).*double(vt.img>0);
         end
-    end
-    %% copy header
-    if ~isempty(target_file) && existfile(target_file)
-        vv = load_nii_BIG_Lab(target_file);
-        vAtlasFA.hdr = vv.hdr;
     end
     save_untouch_nii_gz(vAtlasFA,out_file);
 else

@@ -177,7 +177,12 @@ end
 vvll=load_nii_z(sprintf('%s.label.surfreg.nii',subbasename_tmp));
 msk_full=double(imdilate(vvll.img,ones(3,3,3)));
 msk_full((vl.img~=740) & (ismember(msk_full,cortical_rois)|cerebrum_mask.img>0))=0;
+% msk_full is the surfreg labels, dilated by 3 voxels
+% remove cortical labels + cerebrum mask. Keep third ventricle in the mask.
+%
+% Mask the noncortical or white matter cortical labels by msk_full
 vl.img(~(ismember(vl.img,cortical_rois)|vl.img>1000))=vl.img(~(ismember(vl.img,cortical_rois)|vl.img>1000)).*double(msk_full(~(ismember(vl.img,cortical_rois)|vl.img>1000))>0);
+
 vlwm.img=imdilate(255*(vlwm.img==740),ones(10,10,10));
 vl.img((vl.img==740)& (vlwm.img==0))=0;
 save_untouch_nii_gz(vl,sprintf('%s.svreg.%sdws.label.nii',subbasename_tmp,postfix));

@@ -37,19 +37,25 @@ vt=load_nii_z(tar_file_base);tar_sz=size(vt.img);
 
 %vmx=vm;
 %vmx.hdr.hist.magic='ni1';
-vmx=make_nii(uint16(X1*100));
+%vmx=make_nii(uint16(X1*100));
 %vmx.img=ones(size(X1));
-save_nii(vmx,[x_fname,'.img']);
+%save_nii(vmx,[x_fname,'.img']);
+vmx.img = uint16(X1*100);
+niftiwrite(vmx.img,[x_fname,'.img'],"Combined",false)
 copyfile([mov_file_base(1:end-4) '.hdr'], [x_fname,'.hdr'], 'f');
 
 
 %vxx=load_nii('X.img');
-vmx=make_nii(uint16(Y1*100));
-save_nii(vmx,[y_fname,'.img']);
+%vmx=make_nii(uint16(Y1*100));
+vmx.img = uint16(Y1*100);
+niftiwrite(vmx.img,[y_fname,'.img'],"Combined",false)
+%save_nii(vmx,[y_fname,'.img']);
 copyfile([mov_file_base(1:end-4) '.hdr'], [y_fname,'.hdr'], 'f');
 
-vmx=make_nii(uint16(Z1*100));
-save_nii(vmx,[z_fname,'.img']);
+%vmx=make_nii(uint16(Z1*100));
+vmx.img = uint16(Z1*100);
+%save_nii(vmx,[z_fname,'.img']);
+niftiwrite(vmx.img,[z_fname,'.img'],"Combined",false)
 copyfile([mov_file_base(1:end-4) '.hdr'], [z_fname,'.hdr'], 'f');
 
 %system(['C:\Users\ajosh_000\Downloads\AIR5.3.0\AIR5.3.0\reslice_unwarp.exe ',warp_file_mov,' warped_atlas.img',' -s 1 -a ',mov_file,' -o']);
@@ -117,9 +123,9 @@ vt.hdr.dime.dim(1)=4;vt.hdr.dime.dim(5)=3;
 map=vt.img;
 save([outfile,'_AIR.mat'],'map');
 
-delete([x_fname,'.hdr']);delete([x_fname,'.img']);delete([x_fname,'.mat'])
-delete([y_fname,'.hdr']);delete([y_fname,'.img']);delete([y_fname,'.mat'])
-delete([z_fname,'.hdr']);delete([z_fname,'.img']);delete([z_fname,'.mat'])
+delete([x_fname,'.hdr']);delete([x_fname,'.img']);%delete([x_fname,'.mat'])
+delete([y_fname,'.hdr']);delete([y_fname,'.img']);%delete([y_fname,'.mat'])
+delete([z_fname,'.hdr']);delete([z_fname,'.img']);%delete([z_fname,'.mat'])
 delete([xw_fname,'.hdr']);delete([xw_fname,'.img']);%delete([xw_fname,'.mat'])
 delete([yw_fname,'.hdr']);delete([yw_fname,'.img']);%delete([yw_fname,'.mat'])
 delete([zw_fname,'.hdr']);delete([zw_fname,'.img']);%delete([zw_fname,'.mat'])

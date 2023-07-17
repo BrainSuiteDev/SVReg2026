@@ -17,7 +17,8 @@
 % USA.
 function package_source(out_dir)
 
-src_dirs={'src','compile_scripts','MEX_Files','scripts'};
+%src_dirs={'src','compile_scripts','MEX_Files','scripts'};
+src_dirs={'src','compile_scripts','scripts'};
 for jj=1:length(src_dirs)
     copyfile(fullfile('..',src_dirs{jj}),fullfile(out_dir,src_dirs{jj}));
 end
@@ -25,6 +26,8 @@ mkdir(fullfile(out_dir,'3rdParty'));
 copyfile('../3rdParty/*.m',fullfile(out_dir,'3rdParty'));
 copyfile('../3rdParty/*.c',fullfile(out_dir,'3rdParty'));
 copyfile('../3rdParty/trilinear.cpp',fullfile(out_dir,'3rdParty'));
+copyfile('../3rdParty/warp_points.cpp',fullfile(out_dir,'3rdParty'));
+copyfile('../3rdParty/warp_coord_vol.cpp',fullfile(out_dir,'3rdParty'));
 mkdir(fullfile(out_dir,'3rdParty','AIR_bin'));
 copyfile('../README.md',out_dir);
 copyfile('../LICENSE.txt',out_dir);

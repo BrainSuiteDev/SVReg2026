@@ -17,35 +17,26 @@
 % USA.
 
 
-function [nii, reorient_matrix, sform_new, niifileFlag] = load_nii_BIG_Lab(fname)
-% Wrapper around many custom functions to ease life. It does following
-% while loading nifti-1 file : 
-%   1. Adds sform matrix, if sform does not exist.
-%   2. Applies reorientation to volume to make sform cannonical (sform & other nifti headers are
-%      also appropriately corrected).
-%   3. Updates qform to reflect new reoriented sform.
-%
-% Details: 
-%   fname - filename of nifti file; .nii or .nii.gz
-%   nii - loaded nifti structure
-%   reorient_matrix, sform_new, niifileFlag - see corresponding functions for details. 
-%
-% The loaded nifti structure can be saved to disk by calling either of following: 
-%   save_untouch_nii_gz(nii, 'output_filename.nii.gz')
-%   save_untouch_nii(nii, 'output_filename.nii') % using Jimmy Shen's toolbox
-%
-% Note that this function: 
-%   1. Prefers sform over qform, when both are present (can be modified easily, if required)
-%   2. Uses some intermediate file I/O for some operation - so could be a little slower
-%
+function [nii] = load_nii_BIG_Lab(fname)
+nii.img = niftiread(fname);
 
-workdir = tempname(); mkdir(workdir);
-temp_fname = fullfile(workdir, [Random_String(16) '.nii.gz']);
+v_hdr = niftiinfo(fname);
+nii.hdr = v_hdr;
+nii.hdr.dime.pixdim = nii.hdr.raw.pixdim;
+nii.untouch=1;
+% nii.hdr.hist.magic = nii.hdr.magic;
+% nii.hdr.dime.datatype = nii.hdr.datatype;
+% nii.hdr.hk.sizeof_hdr = nii.hdr.sizeof_hdr;
+% nii.hdr.hk.data_type = nii.hdr.datatype;
+nii.hdr.hist.sform_code = nii.hdr.raw.sform_code;
+nii.hdr.hist.qform_code =  nii.hdr.raw.qform_code;
+nii.hdr.hist.srow_x= nii.hdr.raw.srow_x;
+nii.hdr.hist.srow_y= nii.hdr.raw.srow_y;
+nii.hdr.hist.srow_z= nii.hdr.raw.srow_z;
+nii.hdr.hist.qoffset_x = nii.hdr.raw.qoffset_x;
+nii.hdr.hist.qoffset_y = nii.hdr.raw.qoffset_y;
+nii.hdr.hist.qoffset_z = nii.hdr.raw.qoffset_z;
+nii.hdr.hist.quatern_b = nii.hdr.raw.quatern_b;
+nii.hdr.hist.quatern_c = nii.hdr.raw.quatern_c;
+nii.hdr.hist.quatern_d = nii.hdr.raw.quatern_d;
 
-[niifileFlag, outFile] = check_nifti_file(fname, workdir);
-[nii_out, reorient_matrix, sform_new] = reorient_nifti_sform(outFile, temp_fname);
-nii = add_qform(nii_out);
-
-rmdir(workdir, 's');
-
-end

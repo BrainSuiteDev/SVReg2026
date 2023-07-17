@@ -49,4 +49,5 @@ disp1('inverting map','invert_deformation');
 
 inv_map=make_nii(single(cat(4,inv_map{1},inv_map{2},inv_map{3})),res_tar);
 
+%inv_map.img = single(cat(4,inv_map{1},inv_map{2},inv_map{3}));
 

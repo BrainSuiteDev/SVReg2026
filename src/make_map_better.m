@@ -20,6 +20,7 @@
 function make_map_better(subbasename,extn)
 
 map=load_nii_z([subbasename,'.',extn,'.map.nii.gz']);
+subjspace_info=niftiinfo([subbasename,'.',extn,'.map.nii.gz']);
 
 xmap=squeeze(map.img(:,:,:,1));
 ymap=squeeze(map.img(:,:,:,2));
@@ -47,7 +48,10 @@ msk=find(J3<0);
 fprintf('negative jacobians %d\n',length(msk(:)));
 
 map.img(:,:,:,1)=xmap;map.img(:,:,:,2)=ymap;map.img(:,:,:,3)=zmap;
-save_untouch_nii_gz(map,[subbasename,'.',extn,'.map2.corr.nii.gz']);
+%save_untouch_nii_gz(map,[subbasename,'.',extn,'.map2.corr.nii.gz']);
+
+dws_write_nii([subbasename,'.',extn,'.map2.corr.nii.gz'],single(map.img),subjspace_info); % dws 7/9/23 
+
 v=load_nii_z([subbasename,'.',extn,'.nii.gz']);
 v.img=J3;
 save_untouch_nii_gz(v,[subbasename,'.',extn,'.jacobian.nii.gz']);

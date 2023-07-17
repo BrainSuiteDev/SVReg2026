@@ -30,8 +30,10 @@ src_mask.img=smooth3(double(src_mask.img),'gaussian',[13,13,13],5);
 
 [inv_map]=invert_deformation_parallel(map,src_mask,tar_mask);
 
-save_nii(inv_map,[subbasename,'.svreg.inv.map.nii.gz']);
-fixBSheader([atlasbasename,'.bfc.nii.gz'], [subbasename,'.svreg.inv.map.nii.gz'], [subbasename,'.svreg.inv.map.nii.gz']);
+%save_untouch_nii_gz(inv_map,[subbasename,'.svreg.inv.map.nii.gz']);
+%fixBSheader([atlasbasename,'.bfc.nii.gz'], [subbasename,'.svreg.inv.map.nii.gz'], [subbasename,'.svreg.inv.map.nii.gz']);
+atlasspace_info=niftiinfo([atlasbasename,'.bfc.nii.gz']);
+dws_write_nii([subbasename,'.svreg.inv.map.nii.gz'],(inv_map.img),atlasspace_info);
 
 xmap=squeeze(inv_map.img(:,:,:,1));
 ymap=squeeze(inv_map.img(:,:,:,2));
@@ -49,7 +51,7 @@ vww.img=v_w; vww.img=vww.img.*double(vtissue1.img>0);
 save_untouch_nii_gz(vww,[subbasename_tmp,'.invsvreg.nii.gz']);
 
 [J3]=myjacobian3dmap(xmap, ymap, zmap);
-v=load_nii_z([subbasename_tmp,'.invsvreg.nii.gz']);
+v=vww; %load_nii_z([subbasename_tmp,'.invsvreg.nii.gz']);
 v.img=J3;
 v.hdr.dime.datatype=16;v.hdr.dime.bitpix=16;
 save_untouch_nii_gz(v,[subbasename,'.svreg.inv.jacobian.nii.gz']);
@@ -65,6 +67,7 @@ zmap=squeeze(map.img(:,:,:,3));
 v=load_nii_z([subbasename_tmp,'.svreg.nii.gz']);
 v.img=J3;
 v.hdr.dime.datatype=16;v.hdr.dime.bitpix=16;
+v.hdr.Datatype='single';
 save_untouch_nii_gz(v,[subbasename,'.svreg.jacobian.nii.gz']);
 
 

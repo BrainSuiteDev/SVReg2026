@@ -1,6 +1,9 @@
 Compilation:
 
-SVReg is currently written in a mix of Matlab, C, and C++ code. To compile SVReg, open Matlab and navigate to the compile_scripts/ folder of the repository. The two main functions that you'd need are:
+SVReg is currently written in a mix of Matlab, C, and C++ code. 
+For compilation, Matlab, Image Processing Toolbox, Compiler Toolbox, Parallel Comuting Toolbox are required.
+To compile SVReg, open Matlab and navigate to the compile_scripts/ folder of the repository. The two main functions that you'd need are:
+
 compile_mex: compiles mex functions.
 compile_all: compiles Matlab code and generates executables; also used to package atlas(es) with executables and scripts for distribution
 

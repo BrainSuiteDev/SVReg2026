@@ -16,7 +16,6 @@
 % Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
 % USA.
 
-
 function f=smooth_surf_function(s,f0,a1,a2,aniso,normalize)
 %function f=smooth_surf_function(s,f0,a1,a2,aniso)
 %Performs smoothing of a function on a surface
@@ -28,12 +27,19 @@ function f=smooth_surf_function(s,f0,a1,a2,aniso,normalize)
 if ~exist('a1','var')
     a1=3.1;
 end
+
 if ~exist('a2','var')
-    a2=3.1;
+    if exist('a1','var')
+        a2=a1;
+    else
+        a2=3.1;
+    end
 end
+
 if ~exist('aniso','var')
     aniso=ones(size(s.vertices,1),1);
 end
+
 if ~exist('normalize','var')
     normalize=0;
 end

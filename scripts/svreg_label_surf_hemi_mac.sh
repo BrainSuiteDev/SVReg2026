@@ -3,23 +3,23 @@
 exe_name=$0
 exe_dir=`dirname "$0"`
 
-# If MCR R2019b is installed in a non-default location, define correct path 
+# If MCR R2023a is installed in a non-default location, define correct path 
 # on next line and uncomment it (remove the leading "#")
 #BrainSuiteMCR="/path/to/your/MCR";
 
 if [ -z "$BrainSuiteMCR" ]; then
-  if [ -e /Applications/MATLAB/MATLAB_Runtime/v97 ]; then
-    BrainSuiteMCR="/Applications/MATLAB/MATLAB_Runtime/v97"
-  elif [ -e /Applications/MATLAB_R2019b.app/runtime ]; then
-    BrainSuiteMCR="/Applications/MATLAB_R2019b.app";  
+  if [ -e /Applications/MATLAB/MATLAB_Runtime/R2023a ]; then
+    BrainSuiteMCR="/Applications/MATLAB/MATLAB_Runtime/R2023a"
+  elif [ -e /Applications/MATLAB_R2023a.app/runtime ]; then
+    BrainSuiteMCR="/Applications/MATLAB_R2023a.app";  
   else
     echo
-    echo "Could not find Matlab 2019b with Matlab Compiler or MCR 2019b (v9.7)."
-    echo "Please install the Matlab 2019b MCR from MathWorks at:"
+    echo "Could not find Matlab 2023a with Matlab Compiler or Matlab 2023a (9.14)."
+    echo "Please install the Matlab 2023a MCR from MathWorks at:"
     echo
-    echo "http://www.mathworks.com/products/compiler/mcr/"
+    echo "https://www.mathworks.com/products/compiler/matlab-runtime.html"
     echo 
-    echo "If you already have Matlab 2019b with the Matlab Compiler or MCR 2019b"
+    echo "If you already have Matlab 2023a with the Matlab Compiler or Matlab 2023a"
     echo "installed, please edit ${exe_name} by uncommenting and editing the line:"
     echo "#BrainSuiteMCR=\"/path/to/your/MCR\";"
     echo "(replacing /path/to/your/MCR with the path to your Matlab or MCR installation)"

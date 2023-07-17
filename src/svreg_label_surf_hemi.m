@@ -64,7 +64,11 @@ if strcmp(hemi,'right')
     copyfile([atlasbasename, '.cortex.dewisp.mask.nii.gz'],atlas_name_msk_fname,'f');
     copyfile([atlasbasename, '.bfc.nii.gz'],[subbasename_tmp,'.target.bfc.nii.gz'],'f');%
     copyfile([atlasbasename, '.pvc.frac.nii.gz'],[subbasename_tmp,'.target.pvc.frac.nii.gz'],'f');%
-    copyfile([atlasbasename,'.hippo_carved.nii.gz'],[subbasename_tmp,'.target.hippo_carved.nii.gz'],'f');
+    if exist([atlasbasename,'.hippo_carved.nii.gz'],'file')
+        copyfile([atlasbasename,'.hippo_carved.nii.gz'],[subbasename_tmp,'.target.hippo_carved.nii.gz'],'f');
+    else
+        copyfile([atlasbasename,'.cerebrum.mask.nii.gz'],[subbasename_tmp,'.target.hippo_carved.nii.gz'],'f');
+    end
     atlas_labels_fname=[subbasename_tmp '.target.label.nii'];
     copyfile([atlasbasename, '.label.nii.gz'],[atlas_labels_fname,'.gz'],'f');
     

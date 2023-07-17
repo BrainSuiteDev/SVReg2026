@@ -16,7 +16,7 @@
 % Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
 % USA.
 
-function svreg_multi_parc_gen_surf_screenshots(subbasename, multi_dir, BrainSuitePath)
+function svreg_multiparc_gen_surf_screenshots(subbasename, multi_dir, BrainSuitePath)
 
 [pth,subname,extt]=fileparts(subbasename);
 if isempty(pth)

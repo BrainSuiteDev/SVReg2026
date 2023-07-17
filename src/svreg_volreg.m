@@ -155,9 +155,10 @@ if exist(interm_file_base,'file')
     map.img(msk1)=map_affine.img(msk1);
     disp1('Singularities in Air based map are solved by copy from affine map','svreg_volreg',flags);
 end
-
-save_nii(map,[subbasename_tmp,'.affine.map.nii.gz']);
-fixBSheader([subbasename,'.bfc.nii.gz'], [subbasename_tmp,'.affine.map.nii.gz'],[subbasename_tmp,'.affine.map.nii.gz']);
+%save_untouch_nii_gz(map,[subbasename_tmp,'.affine.map.nii.gz']);
+%fixBSheader([subbasename,'.bfc.nii.gz'], [subbasename_tmp,'.affine.map.nii.gz'],[subbasename_tmp,'.affine.map.nii.gz']);
+subjspace_info=niftiinfo([subbasename,'.bfc.nii.gz']);
+dws_write_nii([subbasename_tmp,'.affine.map.nii.gz'],single(map.img),subjspace_info); % dws 7/8/23 
 
 xmap(Brain1.mask_indx)=map12{1};
 ymap(Brain1.mask_indx)=map12{2};
@@ -196,18 +197,20 @@ zmap1=accumarray(mid_ind,mid_surfmap12{3}/tar_res(3)+ 1 + zdiff*sub_res(3)/tar_r
 xmap(mid_ind)=xmap1(mid_ind);ymap(mid_ind)=ymap1(mid_ind);zmap(mid_ind)=zmap1(mid_ind);
 
 
+tissue1=load_nii_z([subbasename,'.pvc.frac.nii.gz']);
 v_disp.img=zeros(Brain1.Msize(1),Brain1.Msize(2),Brain1.Msize(3),3);
 v_disp.img(:,:,:,1)=xmap;v_disp.img(:,:,:,2)=ymap;v_disp.img(:,:,:,3)=zmap;
 %v_disp.img=truncate(v_disp.img,12);
-tissue1=load_nii_z([subbasename,'.pvc.frac.nii.gz']);
-v_disp=make_nii((v_disp.img),Brain1.resolution);%v_disp.hdr.hist=tissue1.hdr.hist;v_disp.untouch=1;
-save_nii(v_disp,[subbasename_tmp,'.surfreg.map.nii.gz']);clear v_disp;
-fixBSheader([subbasename,'.bfc.nii.gz'], [subbasename_tmp,'.surfreg.map.nii.gz'],[subbasename_tmp,'.surfreg.map.nii.gz']);
+%v_disp=make_nii((v_disp.img),Brain1.resolution);%v_disp.hdr.hist=tissue1.hdr.hist;v_disp.untouch=1;
+%save_untouch_nii_gz(v_disp,[subbasename_tmp,'.surfreg.map.nii.gz']);clear v_disp;
+%fixBSheader([subbasename,'.bfc.nii.gz'], [subbasename_tmp,'.surfreg.map.nii.gz'],[subbasename_tmp,'.surfreg.map.nii.gz']);
+dws_write_nii([subbasename_tmp,'.surfreg.map.nii.gz'],(v_disp.img),subjspace_info);clear v_disp;
 
 vsl=load_nii_z([subbasename_tmp,'.target.label.nii']);
 vsl.img=interp3(vsl.img,(ymap),(xmap),(zmap),'nearest');
 vsl.hdr=tissue1.hdr;
 vsl.hdr.dime.datatype=4;
+vsl.hdr.Datatype = 'int16';
 save_untouch_nii_gz(vsl,sprintf('%s.label.surfreg.nii.gz',subbasename_tmp));
 clearvars -except subbasename subbasename_tmp flags
 %extend_deformation_laplacian(subbasename,subbasename_tmp);

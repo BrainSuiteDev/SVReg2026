@@ -3,7 +3,7 @@ SVRegBinDir="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"/
 ScriptName=$(basename "${BASH_SOURCE[0]}")
 
 if [ -z "$1" ]; then
-  echo BrainSuite v21a SVReg run all
+  echo BrainSuite v23a SVReg run all
   echo for more information, please see: http://brainsuite.org
 	echo
   echo "This script takes the outputs of the BrainSuite cortical surface "

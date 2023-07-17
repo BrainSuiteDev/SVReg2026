@@ -213,7 +213,8 @@ clear mask_knw unmask_knw unmask_unknw x heat_vol
 
 nii = load_untouch_nii_gz([subbase '.cortex.dewisp.mask.nii.gz']);
 nii.img = interpn(volComp_x, volComp_y, volComp_z, heat_map, volin_x, volin_y, volin_z, 'linear', 2);
-save_untouch_nii_gz(nii, [subbase sprintf('.heat_map_sol.nii.gz')], 64);
+nii.hdr.Datatype='double';
+save_untouch_nii_gz(nii, [subbase sprintf('.heat_map_sol.nii.gz')]);
 
 % Compute thickness (using iso-surface)
 [gy,gx,gz] = gradient(heat_map, vox_res_comp, vox_res_comp, vox_res_comp);

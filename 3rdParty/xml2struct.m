@@ -29,7 +29,7 @@ function [ s ] = xml2struct( file )
 
     if (nargin < 1)
         clc;
-        help xml2struct
+        error('Please check inputs using ''help xml2struct''');
         return
     end
     

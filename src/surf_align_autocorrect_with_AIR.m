@@ -224,7 +224,7 @@ if(Verbose)
    Xb=surf1.vertices(bdr1,1);Yb=surf1.vertices(bdr1,2);Zb=surf1.vertices(bdr1,3);
    view_patch(surf1);fh=find(par<pi);sh=find(par>=pi);view(-90,0);
    hold on;line(Xb(fh),Yb(fh),Zb(fh),'color','r');line(Xb(sh),Yb(sh),Zb(sh),'color','b');
-   title('Blue should be above and Red should be below!!');
+   title('Blue should be below and Red should be above!!');
 end
 
 xbdr=cos(par);ybdr=sin(par);

@@ -110,7 +110,10 @@ clear xmap ymap zmap;
 
 vmap.img(:,:,:,1)=xmap2;vmap.img(:,:,:,2)=ymap2;vmap.img(:,:,:,3)=zmap2;
 
-save_untouch_nii_gz(vmap,[subbasename_tmp,'.svreg.map.nii.gz']);
+% save_untouch_nii_gz(vmap,[subbasename_tmp,'.svreg.map.nii.gz']);
+subjspace_info=niftiinfo([subbasename,'.bfc.nii.gz']);
+dws_write_nii([subbasename_tmp,'.svreg.map.nii.gz'],(vmap.img),subjspace_info);
+
 copyfile([subbasename_tmp,'.svreg.map.nii.gz'],[subbasename,'.svreg.map.nii.gz'],'f')
 
 if ~exist('cbm_name','var')
@@ -128,6 +131,7 @@ vsl.img=interp3(vsl.img,(ymap2),(xmap2),(zmap2),'nearest',0);
 %vsl.img(vsl.img==344|vsl.img==345|vsl.img==346|vsl.img==347)=0;
 
 vsl.hdr=vhemi.hdr;vsl.hdr.dime.datatype=4;
+vsl.hdr.Datatype='int16';
 save_untouch_nii_gz(vsl,sprintf('%s.svreg.label.nii.gz',subbasename_tmp));
 
 copyfile(sprintf('%s.svreg.label.nii.gz',subbasename_tmp),sprintf('%s.svreg.init.label.nii.gz',subbasename),'f');

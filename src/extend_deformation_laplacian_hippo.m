@@ -128,7 +128,9 @@ zmap(mask_ind)=deformation{3}+azmap(mask_ind);
 
 map=load_nii_z([subbasename_tmp,'.surfreg.map.nii.gz']);
 map.img(:,:,:,1)=xmap;map.img(:,:,:,2)=ymap;map.img(:,:,:,3)=zmap;
-save_untouch_nii_gz(map,[subbasename_tmp,'.surfreg.map.nii.gz']);
+%save_untouch_nii_gz(map,[subbasename_tmp,'.surfreg.map.nii.gz']);
+subjspace_info=niftiinfo([subbasename,'.bfc.nii.gz']);
+dws_write_nii([subbasename_tmp,'.surfreg.map.nii.gz'],single(map.img),subjspace_info); % dws 7/9/23 
 
 v_atlas=load_nii_z([subbasename_tmp,'.target.pvc.frac.nii.gz']);
 

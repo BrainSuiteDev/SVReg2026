@@ -59,7 +59,8 @@ xmap1=fwd_map.img(:,:,:,1);ymap1=fwd_map.img(:,:,:,2);zmap1=fwd_map.img(:,:,:,3)
 xmap=map.img(:,:,:,1);ymap=map.img(:,:,:,2);zmap=map.img(:,:,:,3);
 xmap1(src_mask.img==0)=xmap(src_mask.img==0);ymap1(src_mask.img==0)=ymap(src_mask.img==0);zmap1(src_mask.img==0)=zmap(src_mask.img==0);
 fwd_map.img(:,:,:,1)=xmap1;fwd_map.img(:,:,:,2)=ymap1;fwd_map.img(:,:,:,3)=zmap1; clear xmap* ymap* zmap*;
-save_nii(fwd_map,[subbasename_tmp,'.surfreg.map.nii.gz']);
-fixBSheader([subbasename,'.bfc.nii.gz'], [subbasename_tmp,'.surfreg.map.nii.gz'], [subbasename_tmp,'.surfreg.map.nii.gz']);
-
+%save_untouch_nii_gz(fwd_map,[subbasename_tmp,'.surfreg.map.nii.gz']);
+%fixBSheader([subbasename,'.bfc.nii.gz'], [subbasename_tmp,'.surfreg.map.nii.gz'], [subbasename_tmp,'.surfreg.map.nii.gz']);
+subjspace_info=niftiinfo([subbasename,'.bfc.nii.gz']);
+dws_write_nii([subbasename_tmp,'.surfreg.map.nii.gz'],fwd_map.img,subjspace_info); % dws 7/9/23
 
