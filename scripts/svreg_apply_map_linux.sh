@@ -3,23 +3,23 @@
 exe_name=$0
 exe_dir=`dirname "$0"`
 
-# If MCR R2023a is installed in a non-default location, define correct path 
+# If MCR R2025b is installed in a non-default location, define correct path 
 # on next line and uncomment it (remove the leading "#")
 #BrainSuiteMCR="/path/to/your/MCR";
 
 if [ -z "$BrainSuiteMCR" ]; then
-  if [ -e /usr/local/MATLAB/MATLAB_Runtime/R2023a ]; then
-    BrainSuiteMCR="/usr/local/MATLAB/MATLAB_Runtime/R2023a";
-  elif [ -e /usr/local/MATLAB/R2023a/runtime ]; then
-    BrainSuiteMCR="/usr/local/MATLAB/R2023a";
+  if [ -e /usr/local/MATLAB/MATLAB_Runtime/R2025b ]; then
+    BrainSuiteMCR="/usr/local/MATLAB/MATLAB_Runtime/R2025b";
+  elif [ -e /usr/local/MATLAB/R2025b/runtime ]; then
+    BrainSuiteMCR="/usr/local/MATLAB/R2025b";
   else
     echo
-    echo "Could not find Matlab 2023a with Matlab Compiler or Matlab 2023a (9.14)."
-    echo "Please install the Matlab 2023a MCR from MathWorks at:"
+    echo "Could not find Matlab 2025b with Matlab Compiler or Matlab 2025b (25.2)."
+    echo "Please install the Matlab 2025b MCR from MathWorks at:"
     echo
     echo "https://www.mathworks.com/products/compiler/matlab-runtime.html"
     echo 
-    echo "If you already have Matlab 2023a with the Matlab Compiler or Matlab 2023a"
+    echo "If you already have Matlab 2025b with the Matlab Compiler or Matlab 2025b"
     echo "installed, please edit ${exe_name} by uncommenting and editing the line:"
     echo "#BrainSuiteMCR=\"/path/to/your/MCR\";"
     echo "(replacing /path/to/your/MCR with the path to your Matlab or MCR installation)"
@@ -45,8 +45,8 @@ svreg_apply_map.sh map_file data_file out_file target_file [smoothness] [datatyp
   out_file: 	output file containing warped data
   target_file: 	target image file for copying header. typically contains bfc image of the target
   smoothness: 	[OPTIONAL] stddev of gaussian smoothing of deformation in voxels for accurate  computation in of derivatives. default is 1.
-  datatype: 	[OPTIONAL] data type of output file. default is same as input_file
-  bitpix: 	[OPTIONAL] bitpix of output file. default is same as input_file
+  datatype: 	[OPTIONAL] data type of output file. default is float32
+  bitpix: 	[OPTIONAL] bitpix of output file. default is 32
   interp_type: 	[OPTIONAL] default is 'nearest'
 EOF
 

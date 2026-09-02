@@ -83,7 +83,7 @@ end
 
 %extrap value is median of values at all corners in the image
 
-if isempty(extrapval)
+if isempty(extrapval) || isnan(extrapval)
     extrapval=median([v.img(1,1,1),v.img(end,1,1),v.img(1,end,1),...
         v.img(1,1,end),v.img(end,1,end),v.img(1,end,end),...
         v.img(end,end,1),v.img(end,end,end)]);
@@ -100,4 +100,4 @@ vr.hdr.dime.scl_slope= 0;
 
 % save the output
 
-save_untouch_nii(vr,outfile);
+save_untouch_nii_gz(vr,outfile);

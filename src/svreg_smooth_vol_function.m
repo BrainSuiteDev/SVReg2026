@@ -29,7 +29,7 @@ if (nargin < 3)
     fprintf('outfile: output nifti file\n');
 end
 
-stdx=str2double(stdx);stdy=str2double(stdy);stdz=str2double(stdz);
+stdx=str2double(string(stdx));stdy=str2double(string(stdy));stdz=str2double(string(stdz));
 
 v=load_nii_BIG_Lab(infile);
 res=v.hdr.dime.pixdim(2:4);

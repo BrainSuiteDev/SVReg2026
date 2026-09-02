@@ -132,6 +132,11 @@ UV=[surfl.u',surfl.v'];
 UV =0.5*(UV*[1,1;1,-1]);
 l1=sum(abs(UV),2);
 l2=sqrt(sum(UV.^2,2));
+
+% prevent division by 0
+l2 = max(l2,1e-6);
+
+
 UV=(UV./[l2,l2]).*[l1,l1];
 surfl.u=UV(:,1);surfl.v=UV(:,2);
 R=sqrt(sum(UV.^2,2));
@@ -145,6 +150,11 @@ UV=[surfr.u',surfr.v'];
 UV =0.5*(UV*[1,1;1,-1]);
 l1=sum(abs(UV),2);
 l2=sqrt(sum(UV.^2,2));
+
+
+% prevent division by 0
+l2 = max(l2,1e-6);
+
 UV=(UV./[l2,l2]).*[l1,l1];
 surfr.u=UV(:,1);surfr.v=UV(:,2);
 R=sqrt(sum(UV.^2,2));

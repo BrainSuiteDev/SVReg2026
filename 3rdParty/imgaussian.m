@@ -23,7 +23,7 @@ function I=imgaussian(I,sigma,siz)
 if(~exist('siz','var')), siz=sigma*6; end
 
 % Make 1D gaussian kernel
-x=-ceil(siz/2):ceil(siz/2);
+x=-ceil(siz(1)/2):ceil(siz(1)/2); % assuming square or cubic kernel in case of nD
 H = exp(-(x.^2/(2*sigma^2))); 
 H = H/sum(H(:));
 

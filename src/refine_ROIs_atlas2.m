@@ -29,7 +29,7 @@ corr_topology_labels(subs,subs_out);
 
 surf1=readdfs(subs_out);%([subs(1:end-3),'topcorr.dfs']);
 labs=unique(surf1.labels);
-labs=setdiff(labs,[0,324,325]);labs=labs(labs>=100);labs=labs(labs<600);
+%labs=setdiff(labs,[0,324,325]);labs=labs(labs>=100);labs=labs(labs<600);
 for kk1=labs(:)'
     for kk2=labs(:)'
         if kk1>=kk2
@@ -51,6 +51,10 @@ for kk1=labs(:)'
         end
         %sulcus=dsearchn(surf1c.vertices,curves1{1});
         surf1co=surf1c;
+        if length(surf1co.faces)<20
+            continue;
+        end
+
         surf1c=smooth_cortex_fast(surf1c,.1,5);%surf1c=myclean_patch_cc(surf1c);
         surf1csm=smooth_cortex_fast(surf1c,.2,1000);
         
