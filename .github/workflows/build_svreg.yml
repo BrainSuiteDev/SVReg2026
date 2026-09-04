@@ -217,11 +217,11 @@ jobs:
           
 
           read -r -d '' MARKDOWN_BODY <<EOF
-          ## Surface-constrained Volume Registration (SVReg) {CLEAN_VER} - Release Notes
-                  
-          ### Releases                    
-
-          EOF
+## Surface-constrained Volume Registration (SVReg) {CLEAN_VER} - Release Notes
+        
+### Releases 
+          
+EOF
           
           echo "Updating release page on GitHub..."
           gh release edit "$TAG_NAME" --notes "$MARKDOWN_BODY"
