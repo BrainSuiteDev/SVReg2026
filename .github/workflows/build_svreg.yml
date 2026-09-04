@@ -1,0 +1,227 @@
+name: Build SVReg on GitHub Runner
+run-name: Build SVReg by @${{ github.actor }}
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  release:
+    types: [ published ]
+
+env:
+  DEV_VERSION: 26a_dev
+  REF_NAME: ${{ github.ref_name }}  
+  MLM_LICENSE_TOKEN: ${{ secrets.MATLAB_TOKEN }}
+  
+jobs:
+  build:
+    permissions: write-all
+    name: Build SVReg on GitHub Runner
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            enable_cache: true
+            suffix: linux.tar.gz
+          - os: windows-latest
+            enable_cache: true
+            suffix: win64.zip
+          - os: macos-26
+            enable_cache: false
+            suffix: maca64.tar.gz
+          - os: macos-26-intel
+            enable_cache: true
+            suffix: maci64.tar.gz
+            
+    runs-on:
+      labels: ["${{ matrix.os }}" ]
+
+    steps:
+      - name: Going out to clean
+        if: runner.os == 'Linux'
+        run: |
+          echo "Before cleanup:"
+          df -h
+          # Delete massive pre-installed software directories
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          echo "After cleanup:"
+          df -h
+          
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set release version
+        if: github.event_name == 'release'
+        shell: bash
+        run: |
+          echo "VERSION=${REF_NAME#v}" >> $GITHUB_ENV
+
+      - name: Set dev version
+        if: github.event_name != 'release'
+        shell: bash
+        run: |
+          echo "VERSION=${DEV_VERSION#v}" >> $GITHUB_ENV
+
+      - name: Construct Package Name
+        shell: bash
+        run: |
+          LOCAL_SHA=${GITHUB_SHA::7}     
+          FILENAME=svreg_${{ env.VERSION }}_build_${LOCAL_SHA}_${{ matrix.suffix }}
+          echo "SHORT_SHA=${LOCAL_SHA}" >> $GITHUB_ENV
+          echo "PackageFile=${FILENAME}" >> $GITHUB_ENV          
+          echo "Package=${{ github.workspace }}/compile_scripts/${FILENAME}" >> $GITHUB_ENV
+
+      - name: Set up MATLAB
+        uses: matlab-actions/setup-matlab@v3
+        with:
+          release: R2025b
+          cache: ${{ matrix.enable_cache }}
+          products: >
+            MATLAB_Compiler
+            Image_Processing_Toolbox
+            Medical_Imaging_Toolbox
+            Parallel_Computing_Toolbox
+
+      - name: Minimize MATLAB Caching Footprint
+        run: |
+          MATLAB_ROOT=$(dirname $(dirname $(which matlab)))
+          
+          # Safely remove only the heavy HTML user documentation (Saves 1GB+ flat)
+          if [ -d "$MATLAB_ROOT/help" ]; then
+            rm -rf "$MATLAB_ROOT/help"
+          fi
+        shell: bash            
+
+      - name: setup MSVC compiler
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+              
+      - name: build Windows air programs
+        if: runner.os == 'Windows'
+        working-directory: 3rdParty
+        run: |
+          mkdir -d AIR_bin
+          cl.exe /Fe:AIR_bin\ warp_points.cpp lib\win64\RPW_x64_MT.lib
+          cl.exe /Fe:AIR_bin\ warp_coord_vol.cpp lib\win64\RPW_x64_MT.lib
+  
+      - name: build Mac air programs
+        if: runner.os == 'macOS' && runner.arch == 'X64'
+        working-directory: 3rdParty
+        run: |
+          install -d AIR_bin
+          g++ -Llib/maci64 warp_points.cpp -lRPW -lm -O3 -o AIR_bin/warp_points_mac
+          g++ -Llib/maci64 warp_coord_vol.cpp -lRPW -lm -O3 -o AIR_bin/warp_coord_vol_mac
+  
+      - name: build Mac air programs
+        if: runner.os == 'macOS' && runner.arch == 'ARM64'
+        working-directory: 3rdParty
+        run: |
+          install -d AIR_bin
+          g++ -Llib/maca64 warp_points.cpp -lRPW -lm -O3 -o AIR_bin/warp_points_mac -target arm64-apple-macos15
+          g++ -Llib/maca64 warp_coord_vol.cpp -lRPW -lm -O3 -o AIR_bin/warp_coord_vol_mac -target arm64-apple-macos15
+  
+      - name: build Linux air programs
+        if: runner.os == 'Linux'
+        working-directory: 3rdParty
+        run: |
+          install -d AIR_bin
+          g++ -Llib/linux -static-libstdc++ -static-libgcc warp_points.cpp -lRPW -lm -O3 -o AIR_bin/warp_points_linux
+          g++ -Llib/linux -static-libstdc++ -static-libgcc warp_coord_vol.cpp -lRPW -lm -O3 -o AIR_bin/warp_coord_vol_linux
+        
+      - name: compile SVReg Mex files
+        uses: matlab-actions/run-command@v3
+        with:
+          startup-options: -sd compile_scripts
+          command: compile_mex
+          
+      - name: compile SVReg
+        uses: matlab-actions/run-command@v3
+        with:
+          startup-options: -sd compile_scripts
+          command: "compile_all --package ${{ env.VERSION }}_${{ env.SHORT_SHA }}"  
+
+      - name: check build
+        shell: bash
+        run: |
+          echo -------- compile_scripts --------
+          ls -lrt compile_scripts
+
+      - name: Install Apple Certificates
+        if: runner.os == 'macOS'
+        id: import_certs
+        uses: apple-actions/import-codesign-certs@v7
+        with:
+          p12-file-base64: ${{ secrets.MACOS_CERTIFICATE_BASE64 }}
+          p12-password: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+          
+      - name: Execute Apple Code Signing & DMG Packaging
+        if: runner.os == 'macOS'
+        shell: bash
+        env:
+          MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+          MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.MACOS_NOTARIZATION_APPLE_ID }}
+          MACOS_NOTARIZATION_PWD: ${{ secrets.MACOS_NOTARIZATION_PWD }}
+          MACOS_TEAM_ID: ${{ secrets.MACOS_TEAM_ID }}
+          MACOS_DEVELOPER_ID: ${{ secrets.MACOS_DEVELOPER_ID }}
+        run: |
+          FILENAME=${{ env.PackageFile }} 
+          DMGFILE=${FILENAME%.tar.gz}_signed.dmg  
+          DMGPATH="${{ github.workspace }}/$DMGFILE"   
+          ./compile_scripts/apple_codesigning.sh "${{ env.Package }}" "${{ env.VERSION }}_build_${{ env.SHORT_SHA }}" "$DMGPATH"
+          echo "PackageFile=${DMGFILE}" >> $GITHUB_ENV          
+          echo "Package=${DMGPATH}" >> $GITHUB_ENV
+
+      - name: Save Build as Artifact
+        if: github.event_name != 'release'
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ env.PackageFile }}
+          path: ${{ env.Package }}
+          archive: false
+          overwrite: true
+          retention-days: 7
+
+      - name: Publish ${{ env.Package }}
+        if: github.event_name == 'release'
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "${{ env.Package }}"
+          tag: "v${{ env.VERSION }}"
+          allowUpdates: true
+
+      - name: Go out to clean again
+        if: always()
+        shell: bash
+        run: |
+          rm -rf $GITHUB_WORKSPACE/*
+          rm -rf $GITHUB_WORKSPACE/.* 2>/dev/null || true
+
+  # This job executes alone ONLY after all 4 matrix compilations finish successfully
+  update_release_notes:
+    name: Update Production Release Description
+    needs: build                          # Forces this job to wait for your compilation job to finish
+    if: github.event_name == 'release'     # Only run this for true official release events
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Publish Release Notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Authenticates the native gh CLI engine
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          CLEAN_VER="${TAG_NAME#v}"
+          echo "Compiling Markdown text block for Release ${TAG_NAME}..."
+          
+
+          read -r -d '' MARKDOWN_BODY <<EOF
+          ## Surface-constrained Volume Registration (SVReg) {CLEAN_VER} - Release Notes
+                  
+          ### Releases                    
+
+          EOF
+          
+          echo "Updating release page on GitHub..."
+          gh release edit "$TAG_NAME" --notes "$MARKDOWN_BODY"
