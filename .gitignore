@@ -1,0 +1,13 @@
+*.mexa64
+compile_scripts/buildresult.json
+compile_scripts/includedSupportPackages.txt
+*maci64.tar.gz
+compile_scripts/requiredMCRProducts.txt
+compile_scripts/unresolvedSymbols.txt
+*.mexmaci64
+*.mexmaca64
+*.p12
+*.dmg
+.DS_Store
+warp_coord_vol_mac
+warp_points_mac
