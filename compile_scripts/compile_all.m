@@ -30,7 +30,7 @@ try
         for i = 1:nargin
             if strcmp(varargin{i}, '--package') && i+1 <= nargin
                 package = true;
-                svreg_version = varargin{i+1};
+                svreg_version_str = varargin{i+1};
                 %svreg_build = varargin{i+2};
 
                 i = i + 2; %#ok
@@ -49,109 +49,70 @@ try
         end
     end
     
-    if exist('svreg_version', 'var')
-        set_version(svreg_version);
+    if exist('svreg_version_str', 'var')        
+        set_version(svreg_version_str);
+
+        idx = strfind(svreg_version_str, '_');
+        if isempty(idx) || idx(end) == strlength(svreg_version_str)
+            svreg_info.version=svreg_version_str(1:end-4);
+            svreg_info.build=svreg_version_str(end-3:end)  ;          
+            svreg_info.versstr=svreg_version_str;    
+            fprintf(1,'using old build number scheme:\n')
+            disp(svreg_info)
+        else
+            % Success case using substring extraction
+            lastIdx = idx(end);
+            svreg_info.version=extractBefore(svreg_version_str, lastIdx);
+            svreg_info.build=extractAfter(svreg_version_str, lastIdx);
+            svreg_info.versstr=svreg_version_str;
+            fprintf(1,'using git SHA:\n');
+            disp(svreg_info)
+        end          
     end
-    
+    disp(svreg_info)
+
+    set_version([svreg_info.version,'(build#',svreg_info.build,')']);
+
     if compile
         restoredefaultpath;
         pp=pwd;
         cmd_str=[pp(1:end-16),'/3rdParty',pathsep,pp(1:end-16),'/MEX_Files',pathsep,pp(1:end-16),'/src'];
         addpath(cmd_str);
-
-        
-        %addpath(genpath('../src'));
-        
-        if ispc
-           try
-               mcc -m -v svreg.m
-           catch
-               disp('Dist Computing Toolbox Needs to be Disabled on Windows!!!!!! Needs to fix this!');
-               rmpath(genpath('C:\Program Files\MATLAB\R2012a\toolbox\distcomp'));
-               mcc -m -v svreg.m
-           end
-            mcc -m -v svreg_label_surf_hemi.m
-            mcc -m -v generate_stats_xls.m
-            mcc -m -v volmap_ball.m
-            mcc -m -v svreg_volreg.m
-            mcc -m -v clean_intermediate_files.m
-            mcc -m -v refine_ROIs2.m
-            mcc -m -v svreg_refinements.m
-            mcc -m -v refine_sulci_hemi.m
-            mcc -m -v register_cc_curve.m
-            mcc -m -v thicknessPVC.m
-            mcc -m -v svreg_smooth_surf_function.m
-            mcc -m -v svreg_make_atlas.m
-            mcc -m -v svreg_apply_map.m
-            mcc -m -v gui_bias_correct.m
-            mcc -m -v svreg_get_mni_tal.m
-            mcc -m -v generate_vol_param_stats_xls.m
-            mcc -m -v svreg_smooth_vol_function.m
-            mcc -m -v svreg_resample.m
-            mcc -m -v svreg_labelwith_atlas.m
-            mcc -m -v svreg_sulcal_map.m
-            mcc -m -v svreg_mni2sub.m
-            mcc -m -v svreg_thickness2atlas.m
-            mcc -m svreg_multiparc.m
-
-
-        elseif ismac || isunix
-            cmd_str=['-I ',cmd_str];
-            cmd_str = strrep(cmd_str, pathsep, ' -I ');
-            
-            mrt=matlabroot;
-            cmd_str1=[mrt,'/bin/mcc -m -v svreg.m ' cmd_str];
-            cmd_str3=[mrt,'/bin/mcc -m -v svreg_label_surf_hemi.m ' cmd_str];
-            cmd_str4=[mrt,'/bin/mcc -m -v generate_stats_xls.m ' cmd_str];
-            cmd_str5=[mrt,'/bin/mcc -m -v volmap_ball.m ' cmd_str];
-            cmd_str6=[mrt,'/bin/mcc -m -v svreg_volreg.m ' cmd_str];
-            cmd_str7=[mrt,'/bin/mcc -m -v clean_intermediate_files.m ' cmd_str];
-            cmd_str8=[mrt,'/bin/mcc -m -v refine_ROIs2.m ' cmd_str];
-            cmd_str9=[mrt,'/bin/mcc -m -v svreg_refinements.m ' cmd_str];
-            cmd_str10=[mrt,'/bin/mcc -m -v refine_sulci_hemi.m ' cmd_str];
-            cmd_str11=[mrt,'/bin/mcc -m -v register_cc_curve.m ' cmd_str];
-            cmd_str12=[mrt,'/bin/mcc -m -v thicknessPVC.m ' cmd_str];
-            cmd_str13=[mrt,'/bin/mcc -m -v svreg_smooth_surf_function.m ' cmd_str];
-            cmd_str14=[mrt,'/bin/mcc -m -v svreg_make_atlas.m ' cmd_str];
-            cmd_str15=[mrt,'/bin/mcc -m -v svreg_apply_map.m ' cmd_str];
-            cmd_str16=[mrt,'/bin/mcc -m -v gui_bias_correct.m ' cmd_str];
-            cmd_str17=[mrt,'/bin/mcc -m -v svreg_get_mni_tal.m ' cmd_str];
-            cmd_str18=[mrt,'/bin/mcc -m -v generate_vol_param_stats_xls.m ' cmd_str];
-            cmd_str19=[mrt,'/bin/mcc -m -v svreg_smooth_vol_function.m ' cmd_str];
-            cmd_str20=[mrt,'/bin/mcc -m -v svreg_resample.m ' cmd_str];
-            cmd_str21=[mrt,'/bin/mcc -m -v svreg_labelwith_atlas.m ' cmd_str];
-            cmd_str22=[mrt,'/bin/mcc -m -v svreg_sulcal_map.m ' cmd_str];
-            cmd_str23=[mrt,'/bin/mcc -m -v svreg_mni2sub.m ' cmd_str];
-            cmd_str24=[mrt,'/bin/mcc -m -v svreg_thickness2atlas.m ' cmd_str];
-            cmd_str25=[mrt,'/bin/mcc -m -v svreg_multiparc.m ' cmd_str];
-
-            
-            system(cmd_str1);
-            system(cmd_str3);system(cmd_str4);
-            system(cmd_str5);system(cmd_str6);
-            system(cmd_str7);system(cmd_str8);
-            system(cmd_str9);system(cmd_str10);
-            system(cmd_str11);system(cmd_str12);
-            system(cmd_str13);system(cmd_str14);
-            system(cmd_str15);system(cmd_str16);
-            system(cmd_str17);system(cmd_str18);
-            system(cmd_str19);system(cmd_str20);
-            system(cmd_str21);system(cmd_str22);
-            system(cmd_str23);system(cmd_str24);
-            system(cmd_str25);
-        end
-        
+        mcc -m -v svreg.m
+        mcc -m -v svreg_label_surf_hemi.m
+        mcc -m -v generate_stats_xls.m
+        mcc -m -v volmap_ball.m
+        mcc -m -v svreg_volreg.m
+        mcc -m -v clean_intermediate_files.m
+        mcc -m -v refine_ROIs2.m
+        mcc -m -v svreg_refinements.m
+        mcc -m -v refine_sulci_hemi.m
+        mcc -m -v register_cc_curve.m
+        mcc -m -v thicknessPVC.m
+        mcc -m -v svreg_smooth_surf_function.m
+        mcc -m -v svreg_make_atlas.m
+        mcc -m -v svreg_apply_map.m
+        mcc -m -v gui_bias_correct.m
+        mcc -m -v svreg_get_mni_tal.m
+        mcc -m -v generate_vol_param_stats_xls.m
+        mcc -m -v svreg_smooth_vol_function.m
+        mcc -m -v svreg_resample.m
+        mcc -m -v svreg_labelwith_atlas.m
+        mcc -m -v svreg_sulcal_map.m
+        mcc -m -v svreg_mni2sub.m
+        mcc -m -v svreg_thickness2atlas.m
+        mcc -m svreg_multiparc.m        
         disp('Compilation done.');
     end
     
     if package
         disp('Packaging...');
         if ispc
-            package_files_pc(svreg_version, atlases);
+            package_files_pc(svreg_info, atlases);
         elseif ismac
-            package_files_mac(svreg_version, atlases);
+            package_files_mac(svreg_info, atlases);
         else
-            package_files_linux(svreg_version, atlases);
+            package_files_linux(svreg_info, atlases);
         end
         cleanup();
         disp('Packing complete');
@@ -164,9 +125,6 @@ end
  
 
 function set_version(svreg_version)
-
-svreg_version=[svreg_version(1:end-4),'(build#',svreg_version(end-3:end),')'];
-
 version_files = {
     ['..' filesep 'src' filesep 'svreg.m'], ...
     ['..' filesep 'src' filesep 'svreg_label_surf_hemi.m'], ...
@@ -220,8 +178,8 @@ fclose(fid);
 end
 
 
-function package_files_pc(svreg_version, atlases)
-[workdir bindir] = setup_package(svreg_version, atlases);
+function package_files_pc(svreg_info, atlases)
+[workdir bindir] = setup_package(svreg_info, atlases);
 
 copyfile('../scripts/svreg_runall.cmd', [bindir filesep 'svreg_runall.cmd']);
 copyfile('../scripts/svreg.cmd', [bindir filesep 'svreg.cmd']);
@@ -257,8 +215,8 @@ rmdir(workdir, 's');
 end
 
 
-function package_files_mac(svreg_version, atlases)
-[workdir bindir] = setup_package(svreg_version, atlases);
+function package_files_mac(svreg_info, atlases)
+[workdir bindir] = setup_package(svreg_info, atlases);
 
 copyfile('svreg.app', [bindir filesep 'svreg.app']);
 copyfile('svreg_label_surf_hemi.app', [bindir filesep 'svreg_label_surf_hemi.app']);
@@ -323,8 +281,8 @@ rmdir(workdir, 's');
 end
 
 
-function package_files_linux(svreg_version, atlases)
-[workdir bindir] = setup_package(svreg_version, atlases);
+function package_files_linux(svreg_info, atlases)
+[workdir bindir] = setup_package(svreg_info, atlases);
 
 copyfile('svreg', [bindir filesep 'svreg']);
 copyfile('svreg_label_surf_hemi', [bindir filesep 'svreg_label_surf_hemi']);
@@ -387,14 +345,13 @@ rmdir(workdir, 's');
 end
 
 
-function [directory, bin_directory] = setup_package(svreg_version, atlases)
-
-svreg_version=[svreg_version(1:end-4),'_build',svreg_version(end-3:end)];
-svreg_string = strrep(num2str(svreg_version), '.', 'p');
-
-directory =  sprintf('svreg_%s_%s', svreg_string, get_platform());
+function [directory, bin_directory] = setup_package(svreg_info, atlases)
+svreg_string = strrep(num2str(svreg_info.version), '.', 'p');    
+directory =  sprintf('svreg_%s_build_%s_%s', svreg_string, svreg_info.build, get_platform());
+disp(directory)
 bin_directory = [directory filesep 'bin'];
 %rcc_directory = [directory filesep 'rcc'];
+disp(bin_directory)
 
 mkdir(directory);
 mkdir(bin_directory);
@@ -411,7 +368,7 @@ for ii = 1:length(atlases)
     copyfile(['..' filesep atlas], atlas_directory);
 end
 
-create_manifest(svreg_version, atlases, [directory filesep 'svregmanifest.xml']);
+create_manifest(svreg_info, atlases, [directory filesep 'svregmanifest.xml']);
 
 if ispc
     line_ending = 'CRLF';
@@ -426,8 +383,8 @@ set_line_endings([directory filesep 'README.md'], line_ending);
 end
 
 
-function create_manifest(svreg_version, atlases, filename)
-svreg_version = num2str(svreg_version);
+function create_manifest(svreg_info, atlases, filename)
+svreg_version = num2str(svreg_info.version);
 compile_date = datestr(now, 'yyyy-mm-dd');
 mcr_version = get_mcr_version();
 platform = get_platform();
@@ -454,7 +411,7 @@ manifest = sprintf(...
     '\t<minimumbrainsuiteversion>14a</minimumbrainsuiteversion>\n'...
     '\t<platform>%s</platform>\n'...
     '%s'...
-    '</svregmanifest>'], svreg_version(1:end-4-6),svreg_version(end-3:end) , compile_date, mcr_version, platform, atlases_xml);
+    '</svregmanifest>'], svreg_info.version,svreg_info.build, compile_date, mcr_version, platform, atlases_xml);
 
 fid = fopen(filename, 'w');
 fprintf(fid, manifest);
