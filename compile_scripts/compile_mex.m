@@ -34,7 +34,14 @@ try
     
     %% Compile trilinear
     cd(thirdparty_dir);
-    mex -v trilinear.cpp;
+    if strcmp(computer('arch'), 'maci64')
+        % recent updates broke compilation for Intel Mac environments --
+        % see: https://www.mathworks.com/matlabcentral/answers/2180662-mex-compilation-failure-after-most-recent-macos-update
+        mex LDFLAGS="$LDFLAGS -ld_classic" -v trilinear.cpp;
+    else
+        % Standard compilation for Apple Silicon, Windows, and Linux
+        mex -v trilinear.cpp;
+    end
     movefile(mex_files, mex_dir, 'f');
     
     cd(bin_dir);
