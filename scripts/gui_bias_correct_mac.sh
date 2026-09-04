@@ -3,7 +3,7 @@
 exe_name=$0
 exe_dir=`dirname "$0"`
 
-# If MCR R2015a is installed in a non-default location, define correct path 
+# If MCR R2025b is installed in a non-default location, define correct path 
 # on next line and uncomment it (remove the leading "#")
 #BrainSuiteMCR="/path/to/your/MCR";
 
@@ -14,7 +14,7 @@ if [ -z "$BrainSuiteMCR" ]; then
     BrainSuiteMCR="/Applications/MATLAB_R2025b.app";  
   else
     echo
-    echo "Could not find Matlab 2025b with Matlab Compiler or Matlab 2025b (v90)."
+    echo "Could not find Matlab 2025b with Matlab Compiler or Matlab 2025b (v25.2)."
     echo "Please install the Matlab 2025b MCR from MathWorks at:"
     echo
     echo "https://www.mathworks.com/products/compiler/matlab-runtime.html"

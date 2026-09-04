@@ -14,7 +14,7 @@ if [ -z "$BrainSuiteMCR" ]; then
     BrainSuiteMCR="/usr/local/MATLAB/R2025b";
   else
     echo
-    echo "Could not find Matlab 2025b with Matlab Compiler or Matlab 2025b (25.2)."
+    echo "Could not find Matlab 2025b with Matlab Compiler or Matlab 2025b (v25.2)."
     echo "Please install the Matlab 2025b MCR from MathWorks at:"
     echo
     echo "https://www.mathworks.com/products/compiler/matlab-runtime.html"
