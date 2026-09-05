@@ -97,7 +97,9 @@ jobs:
 
       - name: setup MSVC compiler
         if: runner.os == 'Windows'
-        uses: ilammy/msvc-dev-cmd@v1
+        uses: step-security/msvc-dev-cmd@v1
+        with:
+          arch: x64
               
       - name: build Windows air programs
         if: runner.os == 'Windows'
