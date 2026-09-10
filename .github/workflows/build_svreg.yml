@@ -216,12 +216,11 @@ jobs:
         run: |
           CLEAN_VER="${TAG_NAME#v}"
           echo "Compiling Markdown text block for Release ${TAG_NAME}..."
-          read -r -d '' STR << 'ENV_EOF'
+          read -r -d '' MARKDOWN_BODY << 'ENV_EOF'
           ## Surface-constrained Volume Registration (SVReg) {CLEAN_VER} - Release Notes
             Line 2 (Indented 2 spaces)
               Line 3 (Indented 4 spaces)
           Line 4 (Back to baseline)
           ENV_EOF
-          MARKDOWN_BODY=""
           echo "Updating release page on GitHub..."
           gh release edit "$TAG_NAME" --notes "$MARKDOWN_BODY"
