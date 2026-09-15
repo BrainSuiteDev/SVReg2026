@@ -16,12 +16,21 @@ if [ ! -f "$SRCTAR" ]; then
   echo "Source tar $SRCTAR not found!"
   exit 1
 fi
-tar xf ${SRCTAR}
-BASENAME=$(basename $SRCTAR)
+
+DMG_STAGE_ROOT="./dmg_staging_tmp"
+rm -rf "$DMG_STAGE_ROOT"
+mkdir -p "$DMG_STAGE_ROOT"
+
+tar xf "${SRCTAR}" -C "$DMG_STAGE_ROOT"
+
+BASENAME=$(basename "$SRCTAR")
 SVREG_SOURCE_FOLDER=${BASENAME%.tar.gz}
-if [ ! -d "$SVREG_SOURCE_FOLDER" ]; then
-  echo "Source folder not found $SVREG_SOURCE_FOLDER!"
-  ls -l
+
+TARGET_SIGN_FOLDER="$DMG_STAGE_ROOT/$SVREG_SOURCE_FOLDER"
+
+if [ ! -d "$TARGET_SIGN_FOLDER" ]; then
+  echo "Expected source folder not found at $TARGET_SIGN_FOLDER!"
+  ls -l "$DMG_STAGE_ROOT"
   exit 1
 fi
 
