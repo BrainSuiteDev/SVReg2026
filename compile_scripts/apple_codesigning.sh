@@ -26,7 +26,7 @@ if [ ! -d "$SVREG_SOURCE_FOLDER" ]; then
 fi
 
 echo ">>> [Pre-Pass Step 1/3] Recursively re-signing all background math modules..."
-find "$SVREG_SOURCE_FOLDER" -type f \( -perm +111 -o -name "*.dylib" -o -name "*.so" -o -name "*.sh" -o -name "*.mexmaci64" \) ! -name "prelaunch" | while read -r binary; do
+find "$SVREG_SOURCE_FOLDER" -type f \( -perm +111 -o -name "*.dylib" -o -name "*.so" -o -name "*.sh" \) ! -name "prelaunch" | while read -r binary; do
     codesign --remove-signature "$binary" 2>/dev/null || true
     codesign --force --options runtime --entitlements "${PLIST}" --no-strict --sign "$MACOS_DEVELOPER_ID" --timestamp "$binary" 2>/dev/null || true
 done
