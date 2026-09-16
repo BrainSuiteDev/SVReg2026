@@ -68,7 +68,7 @@ TMP_DMG="./raw_${version}_svreg.dmg"
 rm -f "$TMP_DMG" "$FINAL_DMG"
 
 echo ">>> [1/3] Packaging Compressed DMG..."
-hdiutil create -srcfolder "$SVREG_SOURCE_FOLDER" \
+hdiutil create -srcfolder "$DMG_STAGE_ROOT" \
                 -volname "svreg${version}" \
                 -fs HFS+ \
                 -fsargs "-c c=64,a=16,e=16" \
