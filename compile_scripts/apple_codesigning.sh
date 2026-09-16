@@ -35,13 +35,13 @@ if [ ! -d "$TARGET_SIGN_FOLDER" ]; then
 fi
 
 echo ">>> [Pre-Pass Step 1/3] Recursively re-signing all background math modules..."
-find "$SVREG_SOURCE_FOLDER" -type f \( -perm +111 -o -name "*.dylib" -o -name "*.so" -o -name "*.sh" \) ! -name "prelaunch" | while read -r binary; do
+find "$TARGET_SIGN_FOLDER" -type f \( -perm +111 -o -name "*.dylib" -o -name "*.so" -o -name "*.sh" \) ! -name "prelaunch" | while read -r binary; do
     codesign --remove-signature "$binary" 2>/dev/null || true
     codesign --force --options runtime --entitlements "${PLIST}" --no-strict --sign "$MACOS_DEVELOPER_ID" --timestamp "$binary" 2>/dev/null || true
 done
 
 echo ">>> [Pre-Pass Step 2/3] Sealing primary executable engines..."
-for APP in ${SVREG_SOURCE_FOLDER}/bin/*.app; do
+for APP in ${TARGET_SIGN_FOLDER}/bin/*.app; do
     EXEC=$(basename $APP);
     EXEC=$APP/Contents/MacOS/${EXEC%.app}
 
@@ -93,4 +93,4 @@ else
 fi
 
 # Clean working space tracks
-rm -rf "$SVREG_SOURCE_FOLDER"
+rm -rf "$DMG_STAGE_ROOT"
