@@ -40,14 +40,34 @@ fi
 # echo "=== Printing exactly what current find loop is catching ==="
 # find "$TARGET_SIGN_FOLDER" -type f \( -perm +111 -o -name "*.dylib" -o -name "*.so" -o -name "*.sh" \) ! -name "prelaunch"
 
+
+# echo ">>> [Pre-Pass Step 1/3] Recursively re-signing all background math modules..."
+# find "$TARGET_SIGN_FOLDER" -type f \( -perm +111 -o -name "*.dylib" -o -name "*.so" -o -name "*.sh" \) \
+#     ! -name "prelaunch" \
+#     ! -name "*.mexmaci64" \
+#     ! -name "*.mexmaca64" \
+#     ! -name "*.icns" | while read -r binary; do
+#         codesign --remove-signature "$binary" 2>/dev/null || true
+#         codesign --force --options runtime --entitlements "${PLIST}" --no-strict --sign "$MACOS_DEVELOPER_ID" --timestamp "$binary" 2>/dev/null || true
+# done
+
 echo ">>> [Pre-Pass Step 1/3] Recursively re-signing all background math modules..."
+# First pass: Handle standard utilities, assets, and shell scripts. Exclude MEX files and prelaunch.
 find "$TARGET_SIGN_FOLDER" -type f \( -perm +111 -o -name "*.dylib" -o -name "*.so" -o -name "*.sh" \) \
     ! -name "prelaunch" \
     ! -name "*.mexmaci64" \
-    ! -name "*.mexmaca64" \
-    ! -name "*.icns" | while read -r binary; do
+    ! -name "*.mexmaca64" | while read -r binary; do
         codesign --remove-signature "$binary" 2>/dev/null || true
         codesign --force --options runtime --entitlements "${PLIST}" --no-strict --sign "$MACOS_DEVELOPER_ID" --timestamp "$binary" 2>/dev/null || true
+done
+
+# Second pass: Sign the binary MEX files with your Developer ID certificate (no Hardened Runtime flag)
+echo ">>> Applying compliant Developer ID layers to MATLAB MEX components..."
+find "$TARGET_SIGN_FOLDER" -type f \( -name "*.mexmaci64" -o -name "*.mexmaca64" \) | while read -r mex_file; do
+    codesign --remove-signature "$mex_file" 2>/dev/null || true
+    # Sign with developer ID and secure timestamp for Apple Notarization, 
+    # but drop --options runtime to keep the internal MathWorks offsets valid.
+    codesign --force --sign "$MACOS_DEVELOPER_ID" --timestamp "$mex_file" 2>/dev/null || true
 done
 
 # echo ">>> [Pre-Pass Step 1/3] Recursively re-signing all background math modules..."
