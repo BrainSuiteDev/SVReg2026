@@ -34,17 +34,27 @@ if [ ! -d "$TARGET_SIGN_FOLDER" ]; then
   exit 1
 fi
 
-echo "=== Checking actual permissions of 3 problematic MEX files ==="
-find "$TARGET_SIGN_FOLDER" -name "cpd_P*" -exec ls -l {} \;
+# echo "=== Checking actual permissions of 3 problematic MEX files ==="
+# find "$TARGET_SIGN_FOLDER" -name "cpd_P*" -exec ls -l {} \;
 
-echo "=== Printing exactly what current find loop is catching ==="
-find "$TARGET_SIGN_FOLDER" -type f \( -perm +111 -o -name "*.dylib" -o -name "*.so" -o -name "*.sh" \) ! -name "prelaunch"
+# echo "=== Printing exactly what current find loop is catching ==="
+# find "$TARGET_SIGN_FOLDER" -type f \( -perm +111 -o -name "*.dylib" -o -name "*.so" -o -name "*.sh" \) ! -name "prelaunch"
 
 echo ">>> [Pre-Pass Step 1/3] Recursively re-signing all background math modules..."
-find "$TARGET_SIGN_FOLDER" -type f \( -perm +111 -o -name "*.dylib" -o -name "*.so" -o -name "*.sh" \) ! -name "prelaunch" | while read -r binary; do
-    codesign --remove-signature "$binary" 2>/dev/null || true
-    codesign --force --options runtime --entitlements "${PLIST}" --no-strict --sign "$MACOS_DEVELOPER_ID" --timestamp "$binary" 2>/dev/null || true
+find "$TARGET_SIGN_FOLDER" -type f \( -perm +111 -o -name "*.dylib" -o -name "*.so" -o -name "*.sh" \) \
+    ! -name "prelaunch" \
+    ! -name "*.mexmaci64" \
+    ! -name "*.mexmaca64" \
+    ! -name "*.icns" | while read -r binary; do
+        codesign --remove-signature "$binary" 2>/dev/null || true
+        codesign --force --options runtime --entitlements "${PLIST}" --no-strict --sign "$MACOS_DEVELOPER_ID" --timestamp "$binary" 2>/dev/null || true
 done
+
+# echo ">>> [Pre-Pass Step 1/3] Recursively re-signing all background math modules..."
+# find "$TARGET_SIGN_FOLDER" -type f \( -perm +111 -o -name "*.dylib" -o -name "*.so" -o -name "*.sh" \) ! -name "prelaunch" | while read -r binary; do
+#     codesign --remove-signature "$binary" 2>/dev/null || true
+#     codesign --force --options runtime --entitlements "${PLIST}" --no-strict --sign "$MACOS_DEVELOPER_ID" --timestamp "$binary" 2>/dev/null || true
+# done
 
 echo ">>> [Pre-Pass Step 2/3] Sealing primary executable engines..."
 for APP in ${TARGET_SIGN_FOLDER}/bin/*.app; do
